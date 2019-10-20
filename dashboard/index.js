@@ -1,23 +1,34 @@
 
-//data load
+d3.csv("https://raw.githubusercontent.com/PvtBooth/cs399project6/master/StockDataGenerator/DATA.csv").then(main, error);
+
+// Main Data
 var dates;
 var stocks;
 var prices;
 
+// Simulation Data
+var startDate = "2009-01-02";
+var endDate = "2019-10-11";
+
 var startingMoney = 10000;
 var currentMoney = startingMoney;
+var stockValue = 0;
+var current_date; //String 
+var purchases = []; // Array of current purchases
 
 //Need to calculate
-var account_percentage_gain = 0.0;
-var average_yearly_percentage_gain = 0.0;
-var standard_deviation = 0.0;
-var percentage_gain_of_spy = 0.0;
-var max_drawdown_percentage = 0.0;
-var sharpe_ratio = 0.0;
+var AccountPercentageGain = 0.0;
+var AverageDailyPercentageGain = 0.0;
+var DailyStandardDeviation = 0.0;
+var YearlyPercentageGain = 0.0;
+var YearlyStandardDeviation = 0.0;
+var SharpeRatio = 0.0;
+var SPYPercentageGain = 0.0;
+var MaxDrawdownPercentage = 0.0;
 
 //Graph vars
-var moneyOverTimeArray = [];
-var dayPercentChange = [];
+var DailyAccountValue = [];
+var DailyPercentageChanges = [];
 
 var margin = {top: 20, right: 30, bottom: 30, left: 80},
     width = 1250 - margin.left - margin.right,
@@ -65,119 +76,62 @@ var text_object = d3.select("body").append("svg")
 var histogram_left_max = -8.0;
 var histogram_right_max = 8.0;
 
-var result = d3.csv("https://raw.githubusercontent.com/PvtBooth/cs399project6/master/StockDataGenerator/DATA.csv").then(function(data)
-{
-    // All Data Mappings
-    dates = data.map(d => d["Date"]);
+function main(data){
+    // Get all data 
     stocks = Object.keys(data[0]);
     stocks.shift();
-    prices = data;
-
-    var purchases = [];
-
-    var iterator = 0;
-    var count = 0;
-
-
-
-
-    dates.forEach(function(date)
+    dates = data.map(d => d.Date);
+    prices = data.reduce((map, entry) => 
     {
-        stocks.forEach(function(stock)
-        {
-            var roll = Math.random();
-            if (roll < 0.1) {
-
-                var value = GetPrice(date, stock);
-                //if we got da money
-                if (value > 0 && currentMoney - value > 0.01) {
-                    //buy dat and log it
-                    purchases.push({ date: date, stock: stock, amount: 1});
-                    currentMoney = currentMoney - value;
-
-                    console.log("Buying a share of " + stock + " on " + date + " for " + value);
-                }
-            }
-        });
-
-
-        var i = purchases.length;
-        while(i--)
-        {
-            var purchase = purchases[i];
-            var purchase_date = new Date(purchase.date);
-            var current_date = new Date(date);
-            
-            var diff = (current_date - purchase_date) / 86400000;
-            if (diff > 60)
-            {
-                var value = GetPrice(date, purchase.stock);
-                if(value > 0)
-                {
-                    currentMoney = currentMoney + value;
-                    console.log("Selling a share of " + purchase.stock + " on " + current_date + " for " + value);
-                    purchases.splice(i, 1);
-                }
-            }
-        }
-
-        // if(iterator == 0 || (iterator % 100) == 0)
-        {
-            moneyOverTimeArray.push({ date: new Date(date), money: currentMoney});
-
-            //console.log("Entry: Date: " + moneyOverTimeArray[count].date + " , money: " + moneyOverTimeArray[count].money);
-
-            count += 1;
-        }
-
-        //Calculate change between today and yesterday
-        if(iterator >= 1)
-        {
-            var yesterdayMoney = moneyOverTimeArray[iterator - 1].money;
-            //currentMoney - yesterday currentMoney
-            var difference = currentMoney - yesterdayMoney;
-            var percent = difference / yesterdayMoney;
-            var result = percent * 100.0;
-
-            if(result > histogram_right_max)
-            {
-                result = histogram_right_max;
-            }
-            else if(result < histogram_left_max)
-            {
-                result = histogram_left_max;
-            }
-
-            dayPercentChange.push(result);
-
-
-            //console.log("Value: " + result);
-        }
-       
-        iterator += 1;
+        map[entry.Date] = entry;
+        return map;
+    }, {});
+   
+    // Run through dates and perform a certain strategy over start to end dates
+    var dateRange = dates.slice(dates.indexOf(startDate), dates.indexOf(endDate));
+    DailyAccountValue.push({ date: new Date(dates[0]), money: currentMoney + stockValue });
+    dateRange.forEach(function(date)
+    {
+        // console.log(date);
+        RandomStrategy(date, 0.01); // almost 5 stocks per day
+        stockValue = GetTotalStockValue(date);
+        CalculatePercentageGain();
+        CheckDrawdown();
+        
+        DailyAccountValue.push({ date: new Date(date), money: currentMoney + stockValue});
+        // console.log("Stocks Value: " + stockValue);
+        // console.log("Cash Value: " + currentMoney);
+        // console.log("Percentage Gain: " + AccountPercentageGain);
+        // console.log("");
     });
+    DailyAccountValue.shift();
+
+    AccountPercentageGain = (currentMoney + stockValue - startingMoney)* 100 / startingMoney;
+    var avg = 0;
+    DailyPercentageChanges.forEach(d => { avg += d; });
+    AverageDailyPercentageGain = avg / DailyPercentageChanges.length;
+
+    var variance = 0;
+    DailyPercentageChanges.forEach(d => { variance += Math.pow(d - AverageDailyPercentageGain, 2)});
+    DailyStandardDeviation = Math.sqrt(variance / DailyPercentageChanges.length);
+
+    YearlyPercentageGain = (Math.pow(1+(AverageDailyPercentageGain/100), 252) - 1) * 100;
+    YearlyStandardDeviation = DailyStandardDeviation*Math.sqrt(252);
+    SharpeRatio = ((YearlyPercentageGain) - 0.035) / YearlyStandardDeviation;
+    SPYPercentageGain = (GetPrice(endDate, " SPY") - GetPrice(startDate, " SPY")) * 100 / GetPrice(startDate, " SPY");
+    
 
     //Remove loading text
     jQuery("#loading").remove();
 
-    // CALCULATE FINAL VAL
-    console.log("Finished");
-    var stockValue = 0;
-    purchases.forEach(function(purchase)
-    {
-        stockValue += GetPrice(dates[dates.length-1], purchase.stock)
-    });
-    console.log("Stocks Value: " + stockValue);
-    console.log("Cash Value: " + currentMoney);
-
     //Money Graph
     // Scale the range of the data
-    line_x.domain(d3.extent(moneyOverTimeArray, function(d, i) { return d.date; }));
-    line_y.domain([0, d3.max(moneyOverTimeArray, function(d, i) { return d.money; })]);
+    line_x.domain(d3.extent(DailyAccountValue, function(d, i) { return d.date; }));
+    line_y.domain([0, d3.max(DailyAccountValue, function(d, i) { return d.money; })]);
 
     // Add the valueline path.
   money_chart.append("path")
-      .data([moneyOverTimeArray])
+      .data([DailyAccountValue])
       .attr("class", "line")
       .attr("d", valueline)
       .attr("fill", "none")
@@ -217,7 +171,7 @@ var histogram = d3.histogram()
     .domain([histogram_left_max, histogram_right_max])
     .thresholds(histogram_right_max * 4);
 
-var bins = histogram(dayPercentChange);
+var bins = histogram(DailyPercentageChanges);
 
   // Scale the range of the data
 var bar_x = d3.scaleLinear()
@@ -283,7 +237,7 @@ var bar_y_axis = bar_y.domain([0, d3.max(bins, function(d) { return d.length; })
         .attr("text-anchor", "middle")  
         .style("font-size", "25px") 
         .style("text-decoration", "underline")  
-        .text("Ending Money: " + currentMoney);
+        .text("Ending Money: " + (currentMoney + stockValue));
 
     text_object.append("text")
         .attr("x", ((width + margin.left)/2))             
@@ -291,7 +245,7 @@ var bar_y_axis = bar_y.domain([0, d3.max(bins, function(d) { return d.length; })
         .attr("text-anchor", "middle")  
         .style("font-size", "25px") 
         .style("text-decoration", "underline")  
-        .text("Account Percentage Gain: " + account_percentage_gain);
+        .text("Account Percentage Gain: " + AccountPercentageGain);
 
     text_object.append("text")
         .attr("x", ((width + margin.left)/2))             
@@ -299,7 +253,7 @@ var bar_y_axis = bar_y.domain([0, d3.max(bins, function(d) { return d.length; })
         .attr("text-anchor", "middle")  
         .style("font-size", "25px") 
         .style("text-decoration", "underline")  
-        .text("Average Yearly Percentage Gain: " + average_yearly_percentage_gain);
+        .text("Average Yearly Percentage Gain: " + YearlyPercentageGain);
 
     text_object.append("text")
         .attr("x", ((width + margin.left)/2))             
@@ -307,7 +261,7 @@ var bar_y_axis = bar_y.domain([0, d3.max(bins, function(d) { return d.length; })
         .attr("text-anchor", "middle")  
         .style("font-size", "25px") 
         .style("text-decoration", "underline")  
-        .text("Standard Deciation: " + standard_deviation);
+        .text("Standard Deviation: " + YearlyStandardDeviation);
 
     text_object.append("text")
         .attr("x", ((width + margin.left)/2))             
@@ -315,7 +269,7 @@ var bar_y_axis = bar_y.domain([0, d3.max(bins, function(d) { return d.length; })
         .attr("text-anchor", "middle")  
         .style("font-size", "25px") 
         .style("text-decoration", "underline")  
-        .text("SPY Percentage Gain: " + percentage_gain_of_spy);
+        .text("SPY Percentage Gain: " + SPYPercentageGain);
 
     text_object.append("text")
         .attr("x", ((width + margin.left)/2))             
@@ -323,7 +277,7 @@ var bar_y_axis = bar_y.domain([0, d3.max(bins, function(d) { return d.length; })
         .attr("text-anchor", "middle")  
         .style("font-size", "25px") 
         .style("text-decoration", "underline")  
-        .text("Max Drawdown Percentage: " + max_drawdown_percentage);
+        .text("Max Drawdown Percentage: " + MaxDrawdownPercentage);
 
     text_object.append("text")
         .attr("x", ((width + margin.left)/2))             
@@ -331,14 +285,107 @@ var bar_y_axis = bar_y.domain([0, d3.max(bins, function(d) { return d.length; })
         .attr("text-anchor", "middle")  
         .style("font-size", "25px") 
         .style("text-decoration", "underline")  
-        .text("Sharpe Ratio: " + sharpe_ratio);
+        .text("Sharpe Ratio: " + SharpeRatio);
 
-});
+}
 
+// Random strategy. Probability to buy each available stock each day. Sell after 60 days of ownership.
+function RandomStrategy(date, probability) {
+    stocks.forEach(function(stock) {
+        if(!HasPrice(date, stock))
+            return;
+        var value = GetPrice(date, stock);
+        var roll = Math.random();
+        if (roll < probability) {
 
-function GetPrice(date, stock)
-{
-    var stockPrices = prices.map(d => d[stock]);
-    var dateIndex = dates.indexOf(date);
-    return parseFloat(stockPrices[dateIndex]);
+            //if we got da money
+            if (currentMoney > value) {
+                //buy dat and log it
+                purchases.push({ date: date, stock: stock, amount: 1});
+                currentMoney -= value;
+                // console.log("Buying a share of " + stock + " on " + date + " for " + value);
+            }
+        }
+    });
+
+    var i = purchases.length;
+    while(i--) {
+        var purchase = purchases[i];
+        var purchase_date = new Date(purchase.date);
+        var current_date = new Date(date);
+
+        var diff = (current_date - purchase_date) / 86400000; // convert ms (dates) to days
+        if (diff > 60) {
+            if(!HasPrice(date, purchase.stock))
+                continue;
+            var value = GetPrice(date, purchase.stock)
+            currentMoney += value;
+            // console.log("Selling a share of " + purchase.stock + " on " + current_date + " for " + value);
+            purchases.splice(i, 1);
+        }
+    }
+}
+
+// Get value of all owned stocks on a certain date
+function GetTotalStockValue(date){
+    var result = 0;
+    purchases.forEach(function(purchase) {
+        result += GetPrice(date, purchase.stock)});
+    // console.log(result);
+    return result;
+}
+
+function CalculatePercentageGain(){
+    var yesterdayMoney = DailyAccountValue[DailyAccountValue.length - 1].money;
+    var result = (currentMoney + stockValue - yesterdayMoney)* 100 / yesterdayMoney;
+    
+    if(result > histogram_right_max)
+    {
+        // console.log(result);
+        result = histogram_right_max;
+    }
+    else if(result < histogram_left_max)
+    {
+        // console.log(result);
+        result = histogram_left_max;
+    }
+    DailyPercentageChanges.push(result);
+}
+
+var drawdownDelta = 0;
+var drawdownPeak = 0;
+function CheckDrawdown(){
+    var yesterdayMoney = DailyAccountValue[DailyAccountValue.length - 1].money;
+    if(currentMoney + stockValue < yesterdayMoney)
+    {
+        drawdownDelta += currentMoney + stockValue - yesterdayMoney;
+        if(drawdownDelta < MaxDrawdownPercentage)
+            MaxDrawdownPercentage = drawdownDelta * 100 /drawdownPeak;
+    }
+    else
+    {
+        drawdownPeak = currentMoney + stockValue;
+        drawdownDelta = 0;
+    }
+}
+
+// Check if a price exists at that stock/date
+function HasPrice(date, stock){
+    var result = parseFloat(prices[date][stock]);
+    if(Number.isNaN(result))
+        return false;
+    return true; 
+}
+
+// Get a price on a stock/date (returns 0 if doesn't exist)
+function GetPrice(date, stock){
+    var result = parseFloat(prices[date][stock]);
+    if(Number.isNaN(result))
+        return 0;
+    return result;
+}
+
+function error(result){
+    console.log("Couldn't load CSV");
+    console.log("Result: " + result);
 }
