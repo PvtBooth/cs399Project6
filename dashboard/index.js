@@ -10,7 +10,7 @@ var prices;
 var startDate = "2009-01-02";
 var endDate = "2019-10-11";
 
-var startingMoney = 10000;
+var startingMoney = 100000;
 var currentMoney = startingMoney;
 var stockValue = 0;
 var current_date; //String 
@@ -33,17 +33,6 @@ var DailyPercentageChanges = [];
 var margin = {top: 20, right: 30, bottom: 30, left: 80},
     width = 1250 - margin.left - margin.right,
     height = 550 - margin.top - margin.bottom;
-
-// var x = d3.scaleBand()
-//     .rangeRound([margin.left, width])
-//     .padding(0.1);
-
-// var xAxis = d3.axisBottom(x);
-
-// var y = d3.scaleLinear()
-//     .range([height, (margin.top + 20)]);
-
-// var yAxis = d3.axisLeft(y);
 
 // set the ranges
 var line_x = d3.scaleTime().range([margin.left, width]);
