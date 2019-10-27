@@ -1,14 +1,42 @@
 <!DOCTYPE html>
 <html>
   <head>
+
     <title>CS399 Project6</title>
     <link rel="stylesheet" href="styles.css">
     <script src="https://d3js.org/d3.v5.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+
   </head>
 
   <body>
+
     <span id = "loading"> Loading... <div class="loader"></div> </span>
+    
+    <button type="button" onclick="startSimulation()">Start Simulation</button>
+
+    <select onchange="changeStrategy(this.value)">
+      <option value="s0">Random Strategy</option>
+      <option value="s1">Strategy 1</option>
+      <option value="s2">Strategy 2</option>
+    </select>
+
+    <label for="start">Start date:
+          <input type="date" onchange="changeStartDate(this)" id="start" name="date-start"
+            value="2009-01-02"
+            min="2009-01-02" max="2019-10-11">
+    </label>
+
+    
+
+    <label for="end">End date:
+               <input type="date" onchange="changeEndDate(this)" id="end" name="date-end"
+                  value="2019-10-11"
+                  min="2009-01-02" max="2019-10-11">
+    </label>
+
+
+
     <script src="index.js"></script>
 <!--     <p style="margin-left: 303px;">People in their late teens and early 20s use hallucinogens more often than any other age range.</p>
     <p style="margin-left: 303px;">Hey look two fraph</p> -->
