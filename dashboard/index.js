@@ -81,8 +81,10 @@ function main(data){
     DailyAccountValue.push({ date: new Date(dates[0]), money: currentMoney + stockValue });
     dateRange.forEach(function(date)
     {
-        // console.log(date);
-        RandomStrategy(date, 0.01); // almost 5 stocks per day
+        console.log(date);
+        //RandomStrategy(date, 0.5); // almost 5 stocks per day
+        
+        LinearlyWeightedMovingAverage(date, 5, 0.01);
         stockValue = GetTotalStockValue(date);
         CalculatePercentageGain();
         CheckDrawdown();
@@ -277,6 +279,54 @@ var bar_y_axis = bar_y.domain([0, d3.max(bins, function(d) { return d.length; })
         .text("Sharpe Ratio: " + SharpeRatio);
 
 }
+
+var DayCounter = 0;
+// Random strategy. Probability to buy each available stock each day. Sell after 60 days of ownership.
+function LinearlyWeightedMovingAverage(date, trendRange, threshold) {
+    stocks.forEach(function(stock) {
+        var val = GetPrice(date, stock);
+        var dateIndex = dates.indexOf(date);
+        var denominator = (trendRange*(trendRange+1)/2);
+        var currentP = 0;  var prevP = 0;
+        // Get today's average
+        for(var i = 0; i < trendRange; i++)
+        {
+            var weight = trendRange - i;
+            if(dateIndex - i < 0)
+                continue;
+            currentP += GetPrice(dates[dateIndex-i], stock)*weight;
+            if(dateIndex - i - 1 < 0)
+                continue;
+            prevP += GetPrice(dates[dateIndex-i - 1], stock)*weight;
+        }
+        var currentP = currentP/denominator;
+        var prevP = prevP/denominator;
+        // Get yesterday's average
+        // console.log("Prev: " + prevP + " Current: " + currentP);
+        var delta = (currentP - prevP)/currentP;
+        // ]console.log("delta: " + delta);
+        if(delta > 0 &&  delta > threshold && currentMoney > val && val != 0)
+        {
+            purchases.push({ date: date, stock: stock, amount: 1});
+            currentMoney -= val;
+            // console.log("Buying a share of " + stock + " on " + date + " for " + val);
+        }
+        if(delta < 0 )  {
+            var i = purchases.length;
+            while(i--) {
+                var purchase = purchases[i];
+                if(purchase.stock != stock)
+                    continue;
+                var value = GetPrice(date, purchase.stock);
+                currentMoney += value;
+                // console.log("Selling a share of " + purchase.stock + " on " + date + " for " + value);
+                purchases.splice(i, 1);
+            }
+        }
+    }
+)}
+
+
 
 // Random strategy. Probability to buy each available stock each day. Sell after 60 days of ownership.
 function RandomStrategy(date, probability) {

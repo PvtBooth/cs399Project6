@@ -9,11 +9,16 @@
 #include <unordered_map>
 #include <set>
 
+const size_t THRESHOLD_STOCK_COUNT = 2600;
+const size_t THRESHOULD_DATE_COUNT = 450;
+
 namespace fs = std::filesystem;
 
 int main()
 {
 	std::unordered_map<std::string, std::unordered_map<std::string, std::string>> dataList;
+	std::unordered_map<std::string, size_t> stockDataCounter;
+	std::unordered_map<std::string, size_t> dateDataCounter;
 	std::set<std::string> dates;
 	std::list<std::string> stocks;
 	for (auto& p : fs::directory_iterator("data"))
@@ -32,6 +37,7 @@ int main()
 		stocks.push_back(stockName);
 		dataList.insert(std::make_pair(stockName, std::unordered_map<std::string, std::string>()));
 		std::string line, day, adj_price;
+		size_t count = 0;
 		while (std::getline(in_file, line)) // read whole line into line
 		{
 			std::istringstream iss(line); // string stream
@@ -45,7 +51,13 @@ int main()
 			std::getline(iss, adj_price, ','); // read first part up to comma, ignore the comma
 
 			dataList[stockName].insert(std::make_pair(day, adj_price));
+			if (adj_price != "")
+			{
+				count++;
+				dateDataCounter[day] = dateDataCounter[day] + 1;
+			}
 		}
+		stockDataCounter.insert(std::make_pair(stockName, count));
 	}
 
 	std::ofstream out_file;
@@ -56,8 +68,11 @@ int main()
 	auto pre_end = stocks.end(); pre_end--;
 	for (auto it = stocks.begin(); it != stocks.end(); ++it)
 	{
+		size_t count = stockDataCounter[*it];
 		if (it == pre_end)
 			out_file << *it << std::endl;
+		else if (count < THRESHOLD_STOCK_COUNT)
+			continue;
 		else
 			out_file << *it << ", ";
 	}
@@ -65,12 +80,16 @@ int main()
 	// ALL OTHER ROWS
 	for (auto it = dates.begin(); it != dates.end(); ++it)
 	{
+		if (dateDataCounter[*it] < THRESHOULD_DATE_COUNT)
+			continue;
 		out_file << *it << ", ";
 		auto pre_end = stocks.end(); pre_end--;
 		for (auto it2 = stocks.begin(); it2 != stocks.end(); ++it2)
 		{
 			if (it2 == pre_end)
 				out_file << dataList[*it2][*it] << std::endl;
+			else if (stockDataCounter[*it2] < THRESHOLD_STOCK_COUNT)
+				continue;
 			else
 				out_file << dataList[*it2][*it] << ", ";
 		}
