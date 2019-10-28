@@ -8,7 +8,7 @@ var startSimulation = function()
   if(goodToRun)
   {
     jQuery("#loading").toggle();
-    d3.csv("https://raw.githubusercontent.com/PvtBooth/cs399project6/master/StockDataGenerator/DATA.csv").then(main, error);
+    d3.csv("https://raw.githubusercontent.com/PvtBooth/cs399project6/master/DATA.csv").then(main, error);
   }
   else
   {
@@ -247,11 +247,11 @@ function main(data)
         // console.log(date);
         if(strategy == "s0")
         {
-          RandomStrategy(date, 0.01); // almost 5 stocks per day
+          RandomStrategy(date, 0.5); // almost 5 stocks per day
         }
         else if(strategy == "s1")
         {
-
+            RandomStrategy(date, 0.1);
         }
         else if(strategy == "s2")
         {
@@ -645,7 +645,7 @@ function RandomStrategy(date, probability) {
                 }
 
                 currentMoney -= value;
-                // console.log("Buying a share of " + stock + " on " + date + " for " + value);
+                //console.log("Buying a share of " + stock + " on " + date + " for " + value);
             }
         }
     });
@@ -662,7 +662,7 @@ function RandomStrategy(date, probability) {
                 continue;
             var value = GetPrice(date, purchase.stock)
             currentMoney += value;
-            // console.log("Selling a share of " + purchase.stock + " on " + current_date + " for " + value);
+            //console.log("Selling a share of " + purchase.stock + " on " + current_date + " for " + value);
             purchases.splice(i, 1);
         }
     }
