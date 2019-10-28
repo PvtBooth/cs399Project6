@@ -29,6 +29,8 @@ var strategy = "s0";
 var startingMoney = 100000;
 var currentMoney = startingMoney;
 var stockValue = 0;
+var maxSharesShown = 50;
+var shareRatioMax = 0.50;
 var current_date; //String 
 var purchases = []; // Array of current purchases
 
@@ -49,6 +51,7 @@ var DailyPercentageChangesWithDates = [];
 var MoneyChangePerYear = [];
 var MoneyChangePerMonth = [];
 var SharesOfStocks = [];
+var RenderedSharesOfStocks = [];
 
 var old_margin = {top: 20, right: 30, bottom: 30, left: 80},
     old_width = 1250 - old_margin.left - old_margin.right,
@@ -110,6 +113,7 @@ var ResetVolatileData = function()
   MoneyChangePerYear = [];
   MoneyChangePerMonth = [];
   SharesOfStocks = [];
+  RenderedSharesOfStocks = [];
 
   d3.select("body").selectAll("svg").remove();
 
@@ -225,6 +229,42 @@ function colorOfShares(amount, max)
   }
 }
 
+function AddToSharesOfStockArray(purchase)
+{
+  var added = false;
+  //Add back to shares
+  for(var i = 0; i < SharesOfStocks.length; ++i)
+  {
+    if(purchase.stock == SharesOfStocks[i].stock)
+    {
+      SharesOfStocks[i].amount += purchase.amount;
+      added = true;
+    }
+  }
+  
+  if(!added)
+  {
+    SharesOfStocks.push({stock: purchase.stock, amount: purchase.amount});
+  }
+}
+
+function ClampSharesOfStockArray()
+{
+  if(SharesOfStocks.length > maxSharesShown)
+  {
+    //Sort based on amount
+    SharesOfStocks.sort(function(a, b){return b.amount - a.amount});
+
+    for(var i = 0; i < maxSharesShown; ++i)
+    {
+      RenderedSharesOfStocks.push(SharesOfStocks[i]);
+    }
+
+    //Sort by alphebetically
+    RenderedSharesOfStocks.sort();
+  }
+}
+
 function main(data)
 {
     //Reset any data that needs to be cleared before a strategy is run.
@@ -272,7 +312,7 @@ function main(data)
     });
     DailyAccountValue.shift();
 
-    CalculateMoneyChangePerYear();
+    //CalculateMoneyChangePerYear();
 
     AccountPercentageGain = (currentMoney + stockValue - startingMoney)* 100 / startingMoney;
     var avg = 0;
@@ -446,6 +486,8 @@ var bar_y_axis = bar_y.domain([0, d3.max(bins, function(d) { return d.length; })
 
 
   //Shares of each stock bought graph
+  ClampSharesOfStockArray();
+
   // Scale the range of the data
 var shares_x = d3.scaleBand()
     .range([margin.left, width]);
@@ -453,19 +495,24 @@ var shares_x = d3.scaleBand()
   // var shares_x = d3.scaleOrdinal()
   //   .range([margin.left, width]);
 
-  var shares_x_axis = shares_x.domain(SharesOfStocks.map(function(d) { return d.stock; }));
+  var shares_x_axis = shares_x.domain(RenderedSharesOfStocks.map(function(d) { return d.stock; }));
 
   var shares_y = d3.scaleLinear()
     .range([height - margin.bottom, 0]);
 
-  var max = d3.max(SharesOfStocks, function(d) { return d.amount; });
+  var max = d3.max(RenderedSharesOfStocks, function(d) { return d.amount; });
 
   var shares_y_axis = shares_y.domain([0, max]);
 
   // Add the x Axis
   shares_of_stocks_bought_chart.append("g")
       .attr("transform", "translate(" + (margin.left + (margin.right/2)) + ", " + (height - margin.top) + ")")
-      .call(d3.axisBottom(shares_x));
+      .call(d3.axisBottom(shares_x))
+      .selectAll("text")  
+        .style("text-anchor", "end")
+        .attr("dx", "-.8em")
+        .attr("dy", "-.45em")
+        .attr("transform", "rotate(-90)");
 
     // text label for the x axis
   shares_of_stocks_bought_chart.append("text")             
@@ -491,7 +538,7 @@ var shares_x = d3.scaleBand()
 
   // Add the valueBar bar
    shares_of_stocks_bought_chart.selectAll("rect")
-      .data(SharesOfStocks)
+      .data(RenderedSharesOfStocks)
       .enter().append("rect")
       .attr("class", "bar")
       .attr("x", d => shares_x_axis(d.stock)  + (margin.left + (margin.right/2)))
@@ -587,7 +634,7 @@ function LinearlyWeightedMovingAverage(date, trendRange, threshold) {
             prevP += GetPrice(dates[dateIndex-i - 1], stock)*weight;
         }
         var currentP = currentP/denominator; console.log(currentP);
-        var prevP = prevP/denominator; /console.log(prevP);
+        var prevP = prevP/denominator; //console.log(prevP);
         // Get yesterday's average
         // console.log("Prev: " + prevP + " Current: " + currentP);
         var delta = (currentP - prevP)/currentP;
@@ -597,6 +644,9 @@ function LinearlyWeightedMovingAverage(date, trendRange, threshold) {
             purchases.push({ date: date, stock: stock, amount: 1});
             currentMoney -= val;
             // console.log("Buying a share of " + stock + " on " + date + " for " + val);
+
+            //Call Shares function
+            AddToSharesOfStockArray({stock: stock, amount: 1});
         }
         if(delta < 0 )  {
             var i = purchases.length;
@@ -629,21 +679,8 @@ function RandomStrategy(date, probability) {
                 //buy dat and log it
                 purchases.push({ date: date, stock: stock, amount: 1});
 
-                var added = false;
-                //Add back to shares
-                for(var i = 0; i < SharesOfStocks.length; ++i)
-                {
-                  if(stock == SharesOfStocks[i].stock)
-                  {
-                    SharesOfStocks[i].amount += 1;
-                    added = true;
-                  }
-                }
-                
-                if(!added)
-                {
-                  SharesOfStocks.push({stock: stock, amount: 1});
-                }
+                //Call Shares function
+                AddToSharesOfStockArray({stock: stock, amount: 1});
 
                 currentMoney -= value;
                 //console.log("Buying a share of " + stock + " on " + date + " for " + value);
