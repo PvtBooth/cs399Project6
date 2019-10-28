@@ -22,8 +22,8 @@ var stocks;
 var prices;
 
 // Simulation Data
-var startDate = "1/2/2009";
-var endDate = "10/11/2019";
+var startDate = "2009-01-02";
+var endDate = "2019-10-11";
 
 var strategy = "s0";
 var startingMoney = 100000;
@@ -261,7 +261,14 @@ function ClampSharesOfStockArray()
     }
 
     //Sort by alphebetically
-    RenderedSharesOfStocks.sort();
+    RenderedSharesOfStocks.sort(function(a, b)
+    {
+      var x = a.stock.toLowerCase();
+      var y = b.stock.toLowerCase();
+      if (x < y) {return -1;}
+      if (x > y) {return 1;}
+      return 0;
+    });
   }
 }
 
@@ -279,24 +286,21 @@ function main(data)
         return map;
     }, {});
    
-      // Run through dates and perform a certain strategy over start to end dates
-      console.log(dates);
     var dateRange = dates.slice(dates.indexOf(startDate), dates.indexOf(endDate));
     DailyAccountValue.push({ date: new Date(dates[0]), money: currentMoney + stockValue });
     dateRange.forEach(function(date)
     {
-        // console.log(date);
         if(strategy == "s0")
         {
-          RandomStrategy(date, 0.5); // almost 5 stocks per day
+          LinearlyWeightedMovingAverage(date, 20, 0.0001);
         }
         else if(strategy == "s1")
         {
-          LinearlyWeightedMovingAverage(date, 5, 0.01);
+          MeanMethod(date, .2);
         }
         else if(strategy == "s2")
         {
-          
+          RandomStrategy(date, 0.5); // almost 5 stocks per day
         }
 
 
@@ -614,41 +618,100 @@ var shares_x = d3.scaleBand()
 
 }
 
-var DayCounter = 0;
 // Random strategy. Probability to buy each available stock each day. Sell after 60 days of ownership.
 function LinearlyWeightedMovingAverage(date, trendRange, threshold) {
-    stocks.forEach(function(stock) {
-        var val = GetPrice(date, stock);
-        var dateIndex = dates.indexOf(date);
-        var denominator = (trendRange*(trendRange+1)/2);
-        var currentP = 0;  var prevP = 0;
-        // Get today's average
-        for(var i = 0; i < trendRange; i++)
-        {
-            var weight = trendRange - i;
-            if(dateIndex - i < 0)
+  stocks.forEach(function(stock) {
+      var val = GetPrice(date, stock);
+      var dateIndex = dates.indexOf(date);
+      var currentDen = 0; var prevDen = 0;
+      var currentP = 0;  var prevP = 0;
+      // Get today's average
+      for(var i = 0; i < trendRange; i++)
+      {
+          var weight = trendRange - i;
+          if(dateIndex - i < 0)
+              continue;
+          var newCurrentP = GetPrice(dates[dateIndex-i], stock);
+          if(newCurrentP > 0)
+          {
+            currentP += newCurrentP*weight; 
+            currentDen += weight;
+          }
+          if(dateIndex - i - 1 < 0)
+              continue;
+          var newPrevP = GetPrice(dates[dateIndex-i - 1], stock);
+          if(newPrevP > 0)
+          {
+            prevP += newPrevP*weight; 
+            prevDen += weight;
+          }
+      }
+      var currentP = currentP/currentDen;
+      var prevP = prevP/prevDen; 
+      var delta = (currentP - prevP)/currentP;
+      // console.log(delta);
+      // console.log("delta: " + delta);
+      if(delta > threshold && currentMoney > val && val > 0)
+      {
+          purchases.push({ date: date, stock: stock, amount: 1});
+          currentMoney -= val;
+          //Add back to shares
+          AddToSharesOfStockArray({ date: date, stock: stock, amount: 1});
+          // console.log("Buying a share of " + stock + " on " + date + " for " + val);
+      }
+      if(delta < -1*threshold/4 )  {
+          var i = purchases.length;
+          while(i--) {
+              var purchase = purchases[i];
+              if(purchase.stock != stock || !HasPrice(date, stock))
                 continue;
-            currentP += GetPrice(dates[dateIndex-i], stock)*weight;
-            if(dateIndex - i - 1 < 0)
+              var purchase_date = new Date(purchase.date);
+              var current_date = new Date(date);
+              var diff = (current_date - purchase_date) / 86400000; // convert ms (dates) to days
+              if (diff < 90)
                 continue;
-            prevP += GetPrice(dates[dateIndex-i - 1], stock)*weight;
-        }
-        var currentP = currentP/denominator; console.log(currentP);
-        var prevP = prevP/denominator; //console.log(prevP);
-        // Get yesterday's average
-        // console.log("Prev: " + prevP + " Current: " + currentP);
-        var delta = (currentP - prevP)/currentP;
-        // ]console.log("delta: " + delta);
-        if(delta > 0 &&  delta > threshold && currentMoney > val && val != 0)
-        {
-            purchases.push({ date: date, stock: stock, amount: 1});
-            currentMoney -= val;
-            // console.log("Buying a share of " + stock + " on " + date + " for " + val);
+              var value = GetPrice(date, purchase.stock);
+              currentMoney += value;
+              purchases.splice(i, 1);
+              // console.log("Selling a share of " + purchase.stock + " on " + date + " for " + value);
+          }
+      }
+  }
+)}
 
-            //Call Shares function
-            AddToSharesOfStockArray({stock: stock, amount: 1});
-        }
-        if(delta < 0 )  {
+
+var g_sums = [];
+    // uses mean reversion theory, buys under mean, sells above, to a threshold.
+function MeanMethod(date, threshold) {
+
+    //init pass
+    if(g_sums.length == 0)
+    {
+        stocks.forEach(function(stock) {
+            g_sums.push({sum: 0, stock: stock})
+        })
+    }
+
+    //update
+    stocks.forEach(function(stock)
+    {
+        var currPrice = GetPrice(date, stock);
+        var dateIndex = dates.indexOf(date);
+        var stockListIndex = stocks.indexOf(stock); //also index into g_sums
+
+        //update the sum
+        var newSum = g_sums[stockListIndex].sum + currPrice;
+        g_sums[stockListIndex].sum = newSum;
+
+        //find mean
+        var currMean = newSum / (dateIndex + 1);
+
+        //compare
+        var delta = (currPrice - currMean) / currPrice;
+        //console.log("delta: " + delta);
+        if(delta > 0 &&  delta > threshold)
+        {
+            //sell
             var i = purchases.length;
             while(i--) {
                 var purchase = purchases[i];
@@ -656,14 +719,24 @@ function LinearlyWeightedMovingAverage(date, trendRange, threshold) {
                     continue;
                 var value = GetPrice(date, purchase.stock);
                 currentMoney += value;
-                // console.log("Selling a share of " + purchase.stock + " on " + date + " for " + value);
+                //console.log("Selling a share of " + purchase.stock + " on " + date + " for " + value);
                 purchases.splice(i, 1);
             }
         }
-    }
-)}
+        if(delta < 0 && delta < -threshold && currentMoney > currPrice && currPrice != 0)
+        {
+            //buy
+            purchases.push({ date: date, stock: stock, amount: 1});
 
+            //update stocksCount data for viz
+            AddToSharesOfStockArray({ date: date, stock: stock, amount: 1});
 
+            currentMoney -= currPrice;
+            //console.log("Buying a share of " + stock + " on " + date + " for " + currPrice);
+        }
+
+    })
+}
 
 // Random strategy. Probability to buy each available stock each day. Sell after 60 days of ownership.
 function RandomStrategy(date, probability) {
