@@ -50,6 +50,7 @@ var DailyPercentageChanges = [];
 var DailyPercentageChangesWithDates = [];
 var MoneyChangePerYear = [];
 var MoneyChangePerMonth = [];
+var DailyGain = [];
 var SharesOfStocks = [];
 var RenderedSharesOfStocks = [];
 
@@ -112,6 +113,7 @@ var ResetVolatileData = function()
   DailyPercentageChangesWithDates = [];
   MoneyChangePerYear = [];
   MoneyChangePerMonth = [];
+  DailyGain = [];
   SharesOfStocks = [];
   RenderedSharesOfStocks = [];
 
@@ -178,9 +180,9 @@ var changeStartDate = function(p_date)
 var changeEndDate = function(p_date)
 {
   var end_date = p_date.value;
-  var start_calendar = document.getElementById('end');
+  var start_calendar = document.getElementById('start');
 
-  var d1 = Date.parse(endDate);
+  var d1 = Date.parse(end_date);
   var d2 = Date.parse(start_calendar.value);
   
   if (d1 < d2)
@@ -261,6 +263,20 @@ function ClampSharesOfStockArray()
     }
 
     //Sort by alphebetically
+    RenderedSharesOfStocks.sort(function(a, b)
+    {
+      var x = a.stock.toLowerCase();
+      var y = b.stock.toLowerCase();
+      if (x < y) {return -1;}
+      if (x > y) {return 1;}
+      return 0;
+    });
+  }
+  else
+  {
+    //Sort based on amount
+    SharesOfStocks.sort(function(a, b){return b.amount - a.amount});
+    RenderedSharesOfStocks = SharesOfStocks;
     RenderedSharesOfStocks.sort(function(a, b)
     {
       var x = a.stock.toLowerCase();
@@ -549,8 +565,8 @@ var shares_x = d3.scaleBand()
       .attr("y", function(d) { return shares_y_axis(d.amount); })
       .attr("height", function(d) { return height - shares_y_axis(d.amount) - margin.top; })
       .attr("width", shares_x.bandwidth())
-      .attr("fill", function(d) {return colorOfShares(d.amount, max);});
-
+      .attr("fill", "purple");
+//"blue"function(d) {return colorOfShares(d.amount, max);}
 
     text_object.append("text")
         .attr("x", ((width + margin.left)/2))             
@@ -789,13 +805,15 @@ function GetTotalStockValue(date){
 }
 
 function CalculatePercentageGain(){
+
     var yesterdayMoney = DailyAccountValue[DailyAccountValue.length - 1].money;
     var result = (currentMoney + stockValue - yesterdayMoney)* 100 / yesterdayMoney;
     var firstDayMoney = DailyAccountValue[0].money;
 
-    var change_value = (currentMoney + stockValue - firstDayMoney)* 100 / firstDayMoney;
+    var change_value = (currentMoney + stockValue - yesterdayMoney)* 100 / yesterdayMoney;
 
-    DailyPercentageChangesWithDates.push({ date: DailyAccountValue[DailyAccountValue.length - 1].date, percent: result, change: change_value })
+    if (DailyAccountValue.length != 1)
+      DailyPercentageChangesWithDates.push({ date: DailyAccountValue[DailyAccountValue.length - 1].date, percent: result, change: change_value })
 
     if(result > histogram_right_max)
     {
