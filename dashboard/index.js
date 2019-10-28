@@ -22,8 +22,8 @@ var stocks;
 var prices;
 
 // Simulation Data
-var startDate = "1/2/2009";
-var endDate = "10/11/2019";
+var startDate = "2009-01-02";
+var endDate = "2019-10-11";
 
 var strategy = "s0";
 var startingMoney = 100000;
@@ -243,9 +243,6 @@ function main(data)
     DailyAccountValue.push({ date: new Date(dates[0]), money: currentMoney + stockValue });
     dateRange.forEach(function(date)
     {
-
-
-        console.log(date);
         if(strategy == "s0")
         {
           RandomStrategy(date, 0.5); // almost 5 stocks per day
