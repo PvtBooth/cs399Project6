@@ -22,8 +22,8 @@ var stocks;
 var prices;
 
 // Simulation Data
-var startDate = "2009-01-02";
-var endDate = "2019-10-11";
+var startDate = "1/2/2009";
+var endDate = "10/11/2019";
 
 var strategy = "s0";
 var startingMoney = 100000;
@@ -240,6 +240,7 @@ function main(data)
     }, {});
    
       // Run through dates and perform a certain strategy over start to end dates
+      console.log(dates);
     var dateRange = dates.slice(dates.indexOf(startDate), dates.indexOf(endDate));
     DailyAccountValue.push({ date: new Date(dates[0]), money: currentMoney + stockValue });
     dateRange.forEach(function(date)
@@ -251,7 +252,7 @@ function main(data)
         }
         else if(strategy == "s1")
         {
-            RandomStrategy(date, 0.1);
+          LinearlyWeightedMovingAverage(date, 5, 0.01);
         }
         else if(strategy == "s2")
         {
@@ -391,7 +392,7 @@ var bar_y_axis = bar_y.domain([0, d3.max(bins, function(d) { return d.length; })
       .enter().append("rect")
       .attr("class", "bar")
       .attr("x", d => bar_x_axis(d.x0) + (margin.left + (margin.right/2)))
-      .attr("y", function(d) { console.log(d.length); return bar_y_axis(d.length); })
+      .attr("y", function(d) { /*console.log(d.length);*/ return bar_y_axis(d.length); })
       .attr("height", function(d) { return height - bar_y_axis(d.length) - margin.top; })
       .attr("width", d => Math.max(0, bar_x_axis(d.x1) - bar_x_axis(d.x0) - 1))
       .attr("fill", function(d) {return colorOfBar(d.x0);});
@@ -585,8 +586,8 @@ function LinearlyWeightedMovingAverage(date, trendRange, threshold) {
                 continue;
             prevP += GetPrice(dates[dateIndex-i - 1], stock)*weight;
         }
-        var currentP = currentP/denominator;
-        var prevP = prevP/denominator;
+        var currentP = currentP/denominator; console.log(currentP);
+        var prevP = prevP/denominator; /console.log(prevP);
         // Get yesterday's average
         // console.log("Prev: " + prevP + " Current: " + currentP);
         var delta = (currentP - prevP)/currentP;
