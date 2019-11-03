@@ -1,10 +1,89 @@
 //Remove loading text
 jQuery("#loading").toggle();
 
+//Fancy Calendar
+const start_date_calendar = flatpickr('#start-date', {
+    "defaultDate": "2018-01-02",
+    "dateFormat": "Y-m-d",
+    "minDate": "2009-01-02",
+    "maxDate": "2019-10-11",
+    "disable": [
+        function(date) {
+           return (date.getDay() === 0 || date.getDay() === 6);  // disable weekends
+        }
+    ]
+});
+
+const end_date_calendar = flatpickr('#end-date', {
+    "defaultDate": "2019-10-11",
+    "dateFormat": "Y-m-d",
+    "minDate": "2009-01-02",
+    "maxDate": "2019-10-11",
+    "disable": [
+        function(date) {
+           return (date.getDay() === 0 || date.getDay() === 6);  // disable weekends
+        }
+    ]
+});
+
 var goodToRun = true;
+
+function checkFancyCalendars()
+{
+  var start_date_from_calendar = start_date_calendar.selectedDates[0];
+  var end_date_from_calendar = end_date_calendar.selectedDates[0];
+
+  var d1 = Date.parse(start_date_from_calendar);
+  var d2 = Date.parse(end_date_from_calendar);
+  
+  if (d1 > d2)
+  {
+    //confirm ("Start Date is after End Date");
+    goodToRun = false;
+  }
+  else
+  {
+    goodToRun = true;
+
+    var startYear = start_date_from_calendar.getFullYear();
+    var startMonth = start_date_from_calendar.getMonth() + 1;
+    var startDay = start_date_from_calendar.getDate();
+
+    if(startMonth <= 9)
+    {
+      startMonth = "0" + startMonth;
+    }
+    if(startDay <= 9)
+    {
+      startDay = "0" + startDay;
+    }
+
+    var endYear = end_date_from_calendar.getFullYear();
+    var endMonth = end_date_from_calendar.getMonth() + 1;
+    var endDay = end_date_from_calendar.getDate();
+
+    if(endMonth <= 9)
+    {
+      endMonth = "0" + endMonth;
+    }
+    if(endDay <= 9)
+    {
+      endDay = "0" + endDay;
+    }
+
+    var start_date_string = String(startYear + "-" + startMonth + "-" + startDay);
+    var end_date_string = String(endYear + "-" + endMonth + "-" + endDay);
+
+    startDate = start_date_string;
+    endDate = end_date_string;
+  }
+}
 
 var startSimulation = function()
 {
+  //Check dates
+  checkFancyCalendars();
+
   if(goodToRun)
   {
     jQuery("#loading").toggle();
@@ -15,6 +94,7 @@ var startSimulation = function()
     alert ("Start Date is after End Date");
   }
 }
+
 
 // Main Data
 var dates;
@@ -399,6 +479,11 @@ function main(data)
       .style("text-anchor", "middle")
       .text("Money");
 
+  money_chart.append("text")
+      .attr("x", 0 + (outerWidth/2))
+      .attr("y", 0)
+      .style("text-anchor", "middle")
+      .text("Account Value Over Time");
 
 //Histogram graph
 var histogram = d3.histogram()
@@ -414,20 +499,20 @@ var bar_x = d3.scaleLinear()
 var bar_x_axis = bar_x.domain([histogram_left_max, histogram_right_max]);
 
 var bar_y = d3.scaleLinear()
-    .range([height - margin.bottom, 0]);
+    .range([height, margin.top]);
 
 var bar_y_axis = bar_y.domain([0, d3.max(bins, function(d) { return d.length; })]);
 
  // Add the x Axis
   percent_histogram_chart.append("g")
-      .attr("transform", "translate(" + (margin.left + (margin.right/2)) + ", " + (height - margin.top) + ")")
+      .attr("transform", "translate(" + (margin.left + (margin.right/2)) + ", " + (height) + ")")
       .call(d3.axisBottom(bar_x).ticks(histogram_right_max * 4));
 
     // text label for the x axis
   percent_histogram_chart.append("text")             
       .attr("transform",
             "translate(" + ((width/2) + margin.left + (margin.right)) + " ," + 
-                           (height + 35) + ")")
+                           (height + 60) + ")")
       .style("text-anchor", "middle")
       .text("Percent Account Change");
 
@@ -453,9 +538,15 @@ var bar_y_axis = bar_y.domain([0, d3.max(bins, function(d) { return d.length; })
       .attr("class", "bar")
       .attr("x", d => bar_x_axis(d.x0) + (margin.left + (margin.right/2)))
       .attr("y", function(d) { /*console.log(d.length);*/ return bar_y_axis(d.length); })
-      .attr("height", function(d) { return height - bar_y_axis(d.length) - margin.top; })
+      .attr("height", function(d) { return height - bar_y_axis(d.length); })
       .attr("width", d => Math.max(0, bar_x_axis(d.x1) - bar_x_axis(d.x0) - 1))
       .attr("fill", function(d) {return colorOfBar(d.x0);});
+
+    percent_histogram_chart.append("text")
+      .attr("x", 0 + (outerWidth/2))
+      .attr("y", 0)
+      .style("text-anchor", "middle")
+      .text("Number of Days per Percentage Change Range");
 
 
       //Percentage Change Line Graph
@@ -504,6 +595,12 @@ var bar_y_axis = bar_y.domain([0, d3.max(bins, function(d) { return d.length; })
       .style("text-anchor", "middle")
       .text("Percent");
 
+  percent_change_chart.append("text")
+      .attr("x", 0 + (outerWidth/2))
+      .attr("y", 0)
+      .style("text-anchor", "middle")
+      .text("Account Percentage Change By Day");
+
 
   //Shares of each stock bought graph
   ClampSharesOfStockArray();
@@ -518,7 +615,7 @@ var shares_x = d3.scaleBand()
   var shares_x_axis = shares_x.domain(RenderedSharesOfStocks.map(function(d) { return d.stock; }));
 
   var shares_y = d3.scaleLinear()
-    .range([height - margin.bottom, 0]);
+    .range([height - margin.bottom, margin.top]);
 
   var max = d3.max(RenderedSharesOfStocks, function(d) { return d.amount; });
 
@@ -549,7 +646,7 @@ var shares_x = d3.scaleBand()
 
   // text label for the y axis
   shares_of_stocks_bought_chart.append("text")
-      .attr("transform", "rotate(-90)")
+      .attr("transform", "rotate(-45)")
       .attr("y", 0)
       .attr("x",0 - (height/2))
       .attr("dy", "1em")
@@ -566,6 +663,12 @@ var shares_x = d3.scaleBand()
       .attr("height", function(d) { return height - shares_y_axis(d.amount) - margin.top; })
       .attr("width", shares_x.bandwidth())
       .attr("fill", "purple");
+
+    shares_of_stocks_bought_chart.append("text")
+      .attr("x", 0 + (outerWidth/2))
+      .attr("y", 0)
+      .style("text-anchor", "middle")
+      .text("Top 50 Most Purchased Stocks");
 //"blue"function(d) {return colorOfShares(d.amount, max);}
 
     text_object.append("text")
