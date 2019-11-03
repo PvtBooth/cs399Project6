@@ -3,7 +3,7 @@ jQuery("#loading").toggle();
 
 //Fancy Calendar
 const start_date_calendar = flatpickr('#start-date', {
-    "defaultDate": "2018-01-02",
+    "defaultDate": "2019-01-02",
     "dateFormat": "Y-m-d",
     "minDate": "2009-01-02",
     "maxDate": "2019-10-11",
@@ -149,10 +149,23 @@ var margin = {top: 20, right: 20, bottom: 20, left: 20},
 
 // set the ranges
 var money_line_x = d3.scaleTime().range([margin.left, width]);
-var money_line_y = d3.scaleLinear().range([height, (0)]);
+var money_line_y = d3.scaleLinear().range([height, (margin.top)]);
 
 var percent_line_x = d3.scaleTime().range([margin.left, width]);
-var percent_line_y = d3.scaleLinear().range([height, (0)]);
+var percent_line_y = d3.scaleLinear().range([height, (margin.top)]);
+
+var percent_line_xAxis;
+var percent_line_yAxis;
+
+var percent_line_x_domain;
+var percent_line_y_domain; 
+
+var percent_change_brush = d3.brush()
+    //.extent([percent_line_x.range()[0], percent_line_y.range()[0]], [percent_line_x.range()[1], percent_line_y.range()[1]])
+    .extent([ [padding.left + margin.left, padding.top + (margin.top)], [width + padding.left, height + padding.top] ])
+    .on("end", brushended),
+    idleTimeout,
+    idleDelay = 350;
 
 // define the line
 var moneyline = d3.line()
@@ -163,11 +176,35 @@ var percentline = d3.line()
     .x(function(d) { return percent_line_x(d.date); })
     .y(function(d) { return percent_line_y(d.change); });
 
-var percent_histogram_chart;
-var money_chart;
-var percent_change_chart;
-var shares_of_stocks_bought_chart;
-var text_object;
+var percent_histogram_chart = d3.select(".percentage_histogram")
+    .attr("width", outerWidth)
+    .attr("height", outerHeight)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+var money_chart = d3.select(".account_value_line_chart")
+    .attr("width", outerWidth)
+    .attr("height", outerHeight)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+var percent_change_chart = d3.select(".account_percentage_change_line_chart")
+    .attr("width", outerWidth)
+    .attr("height", outerHeight)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+var shares_of_stocks_bought_chart = d3.select(".stock_bar_chart")
+    .attr("width", outerWidth)
+    .attr("height", outerHeight)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+var text_object = d3.select(".text_at_bottom")
+    .attr("width", outerWidth)
+    .attr("height", outerHeight)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
 var histogram_left_max = -8.0;
 var histogram_right_max = 8.0;
@@ -197,37 +234,51 @@ var ResetVolatileData = function()
   SharesOfStocks = [];
   RenderedSharesOfStocks = [];
 
-  d3.select("body").selectAll("svg").remove();
+  //d3.select("body").selectAll("svg").remove();
 
-  percent_histogram_chart = d3.select("body").append("svg")
+  //Clear charts
+  clearChart("percentage_histogram");
+  percent_histogram_chart = d3.select(".percentage_histogram")
     .attr("width", outerWidth)
     .attr("height", outerHeight)
     .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-  money_chart = d3.select("body").append("svg")
+  //money_chart
+  clearChart("account_value_line_chart");
+  money_chart = d3.select(".account_value_line_chart")
     .attr("width", outerWidth)
     .attr("height", outerHeight)
     .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-  percent_change_chart = d3.select("body").append("svg")
+  //percent_change_chart
+  clearChart("account_percentage_change_line_chart");
+  percent_change_chart = d3.select(".account_percentage_change_line_chart")
     .attr("width", outerWidth)
     .attr("height", outerHeight)
     .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-  shares_of_stocks_bought_chart = d3.select("body").append("svg")
+  //shares_of_stocks_bought_chart
+  clearChart("stock_bar_chart");
+  shares_of_stocks_bought_chart = d3.select(".stock_bar_chart")
     .attr("width", outerWidth)
     .attr("height", outerHeight)
     .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-  text_object = d3.select("body").append("svg")
+  clearChart("text_at_bottom");
+  text_object = d3.select(".text_at_bottom")
     .attr("width", outerWidth)
     .attr("height", outerHeight)
     .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+}
+
+function clearChart(chartName)
+{
+  $("#" + chartName).empty();
 }
 
 var changeStrategy = function(p_strategy)
@@ -235,49 +286,49 @@ var changeStrategy = function(p_strategy)
   strategy = p_strategy;
 }
 
-var changeStartDate = function(p_date)
-{
-  var start_date = p_date.value;
-  var end_calendar = document.getElementById('end');
+// var changeStartDate = function(p_date)
+// {
+//   var start_date = p_date.value;
+//   var end_calendar = document.getElementById('end');
 
-  var d1 = Date.parse(start_date);
-  var d2 = Date.parse(end_calendar.value);
+//   var d1 = Date.parse(start_date);
+//   var d2 = Date.parse(end_calendar.value);
   
-  if (d1 > d2)
-  {
-    //confirm ("Start Date is after End Date");
-    goodToRun = false;
-  }
-  else
-  {
-    goodToRun = true;
+//   if (d1 > d2)
+//   {
+//     //confirm ("Start Date is after End Date");
+//     goodToRun = false;
+//   }
+//   else
+//   {
+//     goodToRun = true;
 
-    startDate = start_date;
-    endDate = end_calendar.value;
-  }
-}
+//     startDate = start_date;
+//     endDate = end_calendar.value;
+//   }
+// }
 
-var changeEndDate = function(p_date)
-{
-  var end_date = p_date.value;
-  var start_calendar = document.getElementById('start');
+// var changeEndDate = function(p_date)
+// {
+//   var end_date = p_date.value;
+//   var start_calendar = document.getElementById('start');
 
-  var d1 = Date.parse(end_date);
-  var d2 = Date.parse(start_calendar.value);
+//   var d1 = Date.parse(end_date);
+//   var d2 = Date.parse(start_calendar.value);
   
-  if (d1 < d2)
-  {
-    //confirm ("Start Date is after End Date");
-    goodToRun = false;
-  }
-  else
-  {
-    goodToRun = true;
+//   if (d1 < d2)
+//   {
+//     //confirm ("Start Date is after End Date");
+//     goodToRun = false;
+//   }
+//   else
+//   {
+//     goodToRun = true;
 
-    startDate = start_calendar.value;
-    endDate = end_date;
-  }
-}
+//     startDate = start_calendar.value;
+//     endDate = end_date;
+//   }
+// }
 
 function colorOfBar(percent)
 {
@@ -550,8 +601,11 @@ var bar_y_axis = bar_y.domain([0, d3.max(bins, function(d) { return d.length; })
 
 
       //Percentage Change Line Graph
-    percent_line_x.domain(d3.extent(DailyPercentageChangesWithDates, function(d, i) { return d.date; }));
-    percent_line_y.domain([d3.min(DailyPercentageChangesWithDates, function(d, i) { return d.change; }), d3.max(DailyPercentageChangesWithDates, function(d, i) { return d.change; })]);
+    percent_line_x_domain = d3.extent(DailyPercentageChangesWithDates, function(d, i) { return d.date; });
+    percent_line_y_domain = [d3.min(DailyPercentageChangesWithDates, function(d, i) { return d.change; }), d3.max(DailyPercentageChangesWithDates, function(d, i) { return d.change; })];
+
+    percent_line_x.domain(percent_line_x_domain);
+    percent_line_y.domain(percent_line_y_domain);
 
     var percent_g = percent_change_chart.append("g")
       .attr("transform", "translate(" + padding.left + "," + padding.top + ")");
@@ -565,11 +619,13 @@ var bar_y_axis = bar_y.domain([0, d3.max(bins, function(d) { return d.length; })
       .attr("stroke", "blue")
       .attr("stroke-width", 1.5);
 
+  percent_line_xAxis = d3.axisBottom(percent_line_x);
+
     // Add the x Axis
   percent_g.append("g")
-    .attr("class", "x axis")
+    .attr("class", "axis axis--x")
     .attr("transform", "translate(0," + height + ")")
-    .call(d3.axisBottom(percent_line_x));
+    .call(percent_line_xAxis);
 
     // text label for the x axis
   percent_g.append("text")             
@@ -579,12 +635,13 @@ var bar_y_axis = bar_y.domain([0, d3.max(bins, function(d) { return d.length; })
       .style("text-anchor", "middle")
       .text("Date");
 
+  percent_line_yAxis = d3.axisLeft(percent_line_y);
 
     // Add the y Axis
   percent_g.append("g")
-    .attr("class", "y axis")
+    .attr("class", "axis axis--y")
     .attr("transform", "translate(" + margin.left + ",0)")
-    .call(d3.axisLeft(percent_line_y));
+    .call(percent_line_yAxis);
 
   // text label for the y axis
   percent_change_chart.append("text")
@@ -600,6 +657,13 @@ var bar_y_axis = bar_y.domain([0, d3.max(bins, function(d) { return d.length; })
       .attr("y", 0)
       .style("text-anchor", "middle")
       .text("Account Percentage Change By Day");
+
+  percent_change_chart.append("g")
+    .attr("class", "brush")
+    .call(percent_change_brush);
+
+  console.log("Before zoom: X: " + percent_line_x.range());
+  console.log("Before zoom: Y: " + percent_line_y.range());
 
 
   //Shares of each stock bought graph
@@ -734,6 +798,37 @@ var shares_x = d3.scaleBand()
         .style("font-size", "25px") 
         .style("text-decoration", "underline")  
         .text("Sharpe Ratio: " + SharpeRatio);
+
+}
+
+//Percent change line chart brush
+function brushended() {
+  var s = d3.event.selection;
+  if (!s) {
+    if (!idleTimeout) return idleTimeout = setTimeout(idled, idleDelay);
+    percent_line_x.domain(percent_line_x_domain);
+    percent_line_y.domain(percent_line_y_domain);
+  } else {
+    percent_line_x.domain([s[0][0], s[1][0]].map(percent_line_x.invert, percent_line_x));
+    percent_line_y.domain([s[1][1], s[0][1]].map(percent_line_y.invert, percent_line_y));
+    percent_change_chart.select(".brush").call(percent_change_brush.move, null);
+  }
+  zoom();
+}
+
+function idled() {
+  idleTimeout = null;
+}
+
+function zoom() {
+  var t = percent_change_chart.transition().duration(750);
+  percent_change_chart.select(".axis--x").transition(t).call(percent_line_xAxis);
+  percent_change_chart.select(".axis--y").transition(t).call(percent_line_yAxis);
+  percent_change_chart.selectAll(".line").transition(t)
+       .attr("d", percentline);
+
+  console.log("After zoom: X: " + percent_line_x.range());
+  console.log("After zoom: Y: " + percent_line_y.range());
 
 }
 
