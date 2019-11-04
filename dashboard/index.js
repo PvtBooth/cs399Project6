@@ -286,6 +286,334 @@ var changeStrategy = function(p_strategy)
   strategy = p_strategy;
 }
 
+function renderPercentHistogramChart()
+{
+  //Histogram graph
+var histogram = d3.histogram()
+    .domain([histogram_left_max, histogram_right_max])
+    .thresholds(histogram_right_max * 4);
+
+var bins = histogram(DailyPercentageChanges);
+
+  // Scale the range of the data
+var bar_x = d3.scaleLinear()
+    .range([margin.left, width]);
+
+var bar_x_axis = bar_x.domain([histogram_left_max, histogram_right_max]);
+
+var bar_y = d3.scaleLinear()
+    .range([height, margin.top]);
+
+var bar_y_axis = bar_y.domain([0, d3.max(bins, function(d) { return d.length; })]);
+
+ // Add the x Axis
+  percent_histogram_chart.append("g")
+      .attr("transform", "translate(" + (margin.left + (margin.right/2)) + ", " + (height) + ")")
+      .call(d3.axisBottom(bar_x).ticks(histogram_right_max * 4));
+
+    // text label for the x axis
+  percent_histogram_chart.append("text")             
+      .attr("transform",
+            "translate(" + ((width/2) + margin.left + (margin.right)) + " ," + 
+                           (height + 60) + ")")
+      .style("text-anchor", "middle")
+      .text("Percent Account Change");
+
+    // Add the y Axis
+  percent_histogram_chart.append("g")
+      .attr("transform", "translate(" + (margin.left + margin.right + (margin.left / 2)) + ", " + 0 + ")")
+      .call(d3.axisLeft(bar_y));
+
+  // text label for the y axis
+  percent_histogram_chart.append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 0)
+      .attr("x",0 - (height/2))
+      .attr("dy", "1em")
+      .style("text-anchor", "middle")
+      .text("Days");
+
+
+   // Add the valueBar bar
+   percent_histogram_chart.selectAll("rect")
+      .data(bins)
+      .enter().append("rect")
+      .attr("class", "bar")
+      .attr("x", d => bar_x_axis(d.x0) + (margin.left + (margin.right/2)))
+      .attr("y", function(d) { /*console.log(d.length);*/ return bar_y_axis(d.length); })
+      .attr("height", function(d) { return height - bar_y_axis(d.length); })
+      .attr("width", d => Math.max(0, bar_x_axis(d.x1) - bar_x_axis(d.x0) - 1))
+      .attr("fill", function(d) {return colorOfBar(d.x0);});
+
+    percent_histogram_chart.append("text")
+      .attr("x", 0 + (outerWidth/2))
+      .attr("y", 0)
+      .style("text-anchor", "middle")
+      .text("Number of Days per Percentage Change Range");
+}
+
+function renderAccountValueChart()
+{
+//Money Graph
+    // Scale the range of the data
+    money_line_x.domain(d3.extent(DailyAccountValue, function(d, i) { return d.date; }));
+    money_line_y.domain([0, d3.max(DailyAccountValue, function(d, i) { return d.money; })]);
+
+  var money_g = money_chart.append("g")
+    .attr("transform", "translate(" + padding.left + "," + padding.top + ")");
+
+        // Add the valueline path.
+  money_g.append("path")
+      .data([DailyAccountValue])
+      .attr("class", "line")
+      .attr("d", moneyline)
+      .attr("fill", "none")
+      .attr("stroke", "green")
+      .attr("stroke-width", 1.5);
+
+    // Add the x Axis
+  money_g.append("g")
+    .attr("class", "x axis")
+    .attr("transform", "translate(0," + height + ")")
+    .call(d3.axisBottom(money_line_x));
+
+    // text label for the x axis
+  money_g.append("text")             
+      .attr("transform",
+            "translate(" + ((width/2) + margin.left) + " ," + 
+                           (height + (margin.bottom) + margin.top) + ")")
+      .style("text-anchor", "middle")
+      .text("Date");
+
+
+    // Add the y Axis
+  money_g.append("g")
+    .attr("class", "y axis")
+    .attr("transform", "translate(" + margin.left + ",0)")
+    .call(d3.axisLeft(money_line_y));
+
+  // text label for the y axis
+  money_chart.append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 0 + (margin.left/4))
+      .attr("x",0 - (((height)/1.8) + margin.top + margin.bottom) )
+      .attr("dy", "1em")
+      .style("text-anchor", "middle")
+      .text("Money");
+
+  money_chart.append("text")
+      .attr("x", 0 + (outerWidth/2))
+      .attr("y", 0)
+      .style("text-anchor", "middle")
+      .text("Account Value Over Time");
+}
+
+function renderPercentChangeChart()
+{
+//Percentage Change Line Graph
+    percent_line_x_domain = d3.extent(DailyPercentageChangesWithDates, function(d, i) { return d.date; });
+    percent_line_y_domain = [d3.min(DailyPercentageChangesWithDates, function(d, i) { return d.change; }), d3.max(DailyPercentageChangesWithDates, function(d, i) { return d.change; })];
+
+    percent_line_x.domain(percent_line_x_domain);
+    percent_line_y.domain(percent_line_y_domain);
+
+    var percent_g = percent_change_chart.append("g")
+      .attr("transform", "translate(" + padding.left + "," + padding.top + ")");
+
+        // Add the percentline path.
+  percent_g.append("path")
+      .data([DailyPercentageChangesWithDates])
+      .attr("class", "line")
+      .attr("d", percentline)
+      .attr("fill", "none")
+      .attr("stroke", "blue")
+      .attr("stroke-width", 1.5);
+
+  percent_line_xAxis = d3.axisBottom(percent_line_x);
+
+    // Add the x Axis
+  percent_g.append("g")
+    .attr("class", "axis axis--x")
+    .attr("transform", "translate(0," + height + ")")
+    .call(percent_line_xAxis);
+
+    // text label for the x axis
+  percent_g.append("text")             
+      .attr("transform",
+            "translate(" + ((width/2) + margin.left) + " ," + 
+                           (height + (margin.bottom) + margin.top) + ")")
+      .style("text-anchor", "middle")
+      .text("Date");
+
+  percent_line_yAxis = d3.axisLeft(percent_line_y);
+
+    // Add the y Axis
+  percent_g.append("g")
+    .attr("class", "axis axis--y")
+    .attr("transform", "translate(" + margin.left + ",0)")
+    .call(percent_line_yAxis);
+
+  // text label for the y axis
+  percent_change_chart.append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 0 + (margin.left/4))
+      .attr("x",0 - (((height)/1.8) + margin.top + margin.bottom) )
+      .attr("dy", "1em")
+      .style("text-anchor", "middle")
+      .text("Percent");
+
+  percent_change_chart.append("text")
+      .attr("x", 0 + (outerWidth/2))
+      .attr("y", 0)
+      .style("text-anchor", "middle")
+      .text("Account Percentage Change By Day");
+
+  percent_change_chart.append("g")
+    .attr("class", "brush")
+    .call(percent_change_brush);
+
+  console.log("Before zoom: X: " + percent_line_x.range());
+  console.log("Before zoom: Y: " + percent_line_y.range());
+
+}
+
+function renderSharesOfStocksChart()
+{
+// Scale the range of the data
+var shares_x = d3.scaleBand()
+    .range([margin.left, width]);
+
+  // var shares_x = d3.scaleOrdinal()
+  //   .range([margin.left, width]);
+
+  var shares_x_axis = shares_x.domain(RenderedSharesOfStocks.map(function(d) { return d.stock; }));
+
+  var shares_y = d3.scaleLinear()
+    .range([height - margin.bottom, margin.top]);
+
+  var max = d3.max(RenderedSharesOfStocks, function(d) { return d.amount; });
+
+  var shares_y_axis = shares_y.domain([0, max]);
+
+  // Add the x Axis
+  shares_of_stocks_bought_chart.append("g")
+      .attr("transform", "translate(" + (margin.left + (margin.right/2)) + ", " + (height - margin.top) + ")")
+      .call(d3.axisBottom(shares_x))
+      .selectAll("text")  
+        .style("text-anchor", "end")
+        .attr("dx", "-.8em")
+        .attr("dy", "-.45em")
+        .attr("transform", "rotate(-90)");
+
+    // text label for the x axis
+  shares_of_stocks_bought_chart.append("text")             
+      .attr("transform",
+            "translate(" + ((width/2) + margin.left + (margin.right)) + " ," + 
+                           (height + 35) + ")")
+      .style("text-anchor", "middle")
+      .text("Stock");
+
+  // Add the y Axis
+  shares_of_stocks_bought_chart.append("g")
+      .attr("transform", "translate(" + (margin.left + margin.right + (margin.left / 2)) + ", " + 0 + ")")
+      .call(d3.axisLeft(shares_y));
+
+  // text label for the y axis
+  shares_of_stocks_bought_chart.append("text")
+      .attr("transform", "rotate(-45)")
+      .attr("y", 0)
+      .attr("x",0 - (height/2))
+      .attr("dy", "1em")
+      .style("text-anchor", "middle")
+      .text("Amount");
+
+  // Add the valueBar bar
+   shares_of_stocks_bought_chart.selectAll("rect")
+      .data(RenderedSharesOfStocks)
+      .enter().append("rect")
+      .attr("class", "bar")
+      .attr("x", d => shares_x_axis(d.stock)  + (margin.left + (margin.right/2)))
+      .attr("y", function(d) { return shares_y_axis(d.amount); })
+      .attr("height", function(d) { return height - shares_y_axis(d.amount) - margin.top; })
+      .attr("width", shares_x.bandwidth())
+      .attr("fill", "purple");
+
+    shares_of_stocks_bought_chart.append("text")
+      .attr("x", 0 + (outerWidth/2))
+      .attr("y", 0)
+      .style("text-anchor", "middle")
+      .text("Top 50 Most Purchased Stocks");
+//"blue"function(d) {return colorOfShares(d.amount, max);}
+}
+
+function renderTextData()
+{
+  text_object.append("text")
+        .attr("x", ((width + margin.left)/2))             
+        .attr("y", 0 + 30)
+        .attr("text-anchor", "middle")  
+        .style("font-size", "25px") 
+        .style("text-decoration", "underline")  
+        .text("Starting Money: " + startingMoney);
+
+    text_object.append("text")
+        .attr("x", ((width + margin.left)/2))             
+        .attr("y", 0 + 60)
+        .attr("text-anchor", "middle")  
+        .style("font-size", "25px") 
+        .style("text-decoration", "underline")  
+        .text("Ending Money: " + (currentMoney + stockValue));
+
+    text_object.append("text")
+        .attr("x", ((width + margin.left)/2))             
+        .attr("y", 0 + 90)
+        .attr("text-anchor", "middle")  
+        .style("font-size", "25px") 
+        .style("text-decoration", "underline")  
+        .text("Account Percentage Gain: " + AccountPercentageGain);
+
+    text_object.append("text")
+        .attr("x", ((width + margin.left)/2))             
+        .attr("y", 0 + 120)
+        .attr("text-anchor", "middle")  
+        .style("font-size", "25px") 
+        .style("text-decoration", "underline")  
+        .text("Average Yearly Percentage Gain: " + YearlyPercentageGain);
+
+    text_object.append("text")
+        .attr("x", ((width + margin.left)/2))             
+        .attr("y", 0 + 150)
+        .attr("text-anchor", "middle")  
+        .style("font-size", "25px") 
+        .style("text-decoration", "underline")  
+        .text("Standard Deviation: " + YearlyStandardDeviation);
+
+    text_object.append("text")
+        .attr("x", ((width + margin.left)/2))             
+        .attr("y", 0 + 180)
+        .attr("text-anchor", "middle")  
+        .style("font-size", "25px") 
+        .style("text-decoration", "underline")  
+        .text("SPY Percentage Gain: " + SPYPercentageGain);
+
+    text_object.append("text")
+        .attr("x", ((width + margin.left)/2))             
+        .attr("y", 0 + 210)
+        .attr("text-anchor", "middle")  
+        .style("font-size", "25px") 
+        .style("text-decoration", "underline")  
+        .text("Max Drawdown Percentage: " + MaxDrawdownPercentage);
+
+    text_object.append("text")
+        .attr("x", ((width + margin.left)/2))             
+        .attr("y", 0 + 240)
+        .attr("text-anchor", "middle")  
+        .style("font-size", "25px") 
+        .style("text-decoration", "underline")  
+        .text("Sharpe Ratio: " + SharpeRatio);
+}
+
+
 // var changeStartDate = function(p_date)
 // {
 //   var start_date = p_date.value;
@@ -483,322 +811,19 @@ function main(data)
     //Remove loading text
     jQuery("#loading").toggle();
 
-    //Money Graph
-    // Scale the range of the data
-    money_line_x.domain(d3.extent(DailyAccountValue, function(d, i) { return d.date; }));
-    money_line_y.domain([0, d3.max(DailyAccountValue, function(d, i) { return d.money; })]);
 
-  var money_g = money_chart.append("g")
-    .attr("transform", "translate(" + padding.left + "," + padding.top + ")");
+    //Render The Graphs
+    renderAccountValueChart();
 
-        // Add the valueline path.
-  money_g.append("path")
-      .data([DailyAccountValue])
-      .attr("class", "line")
-      .attr("d", moneyline)
-      .attr("fill", "none")
-      .attr("stroke", "green")
-      .attr("stroke-width", 1.5);
+    renderPercentHistogramChart();
 
-    // Add the x Axis
-  money_g.append("g")
-    .attr("class", "x axis")
-    .attr("transform", "translate(0," + height + ")")
-    .call(d3.axisBottom(money_line_x));
-
-    // text label for the x axis
-  money_g.append("text")             
-      .attr("transform",
-            "translate(" + ((width/2) + margin.left) + " ," + 
-                           (height + (margin.bottom) + margin.top) + ")")
-      .style("text-anchor", "middle")
-      .text("Date");
-
-
-    // Add the y Axis
-  money_g.append("g")
-    .attr("class", "y axis")
-    .attr("transform", "translate(" + margin.left + ",0)")
-    .call(d3.axisLeft(money_line_y));
-
-  // text label for the y axis
-  money_chart.append("text")
-      .attr("transform", "rotate(-90)")
-      .attr("y", 0 + (margin.left/4))
-      .attr("x",0 - (((height)/1.8) + margin.top + margin.bottom) )
-      .attr("dy", "1em")
-      .style("text-anchor", "middle")
-      .text("Money");
-
-  money_chart.append("text")
-      .attr("x", 0 + (outerWidth/2))
-      .attr("y", 0)
-      .style("text-anchor", "middle")
-      .text("Account Value Over Time");
-
-//Histogram graph
-var histogram = d3.histogram()
-    .domain([histogram_left_max, histogram_right_max])
-    .thresholds(histogram_right_max * 4);
-
-var bins = histogram(DailyPercentageChanges);
-
-  // Scale the range of the data
-var bar_x = d3.scaleLinear()
-    .range([margin.left, width]);
-
-var bar_x_axis = bar_x.domain([histogram_left_max, histogram_right_max]);
-
-var bar_y = d3.scaleLinear()
-    .range([height, margin.top]);
-
-var bar_y_axis = bar_y.domain([0, d3.max(bins, function(d) { return d.length; })]);
-
- // Add the x Axis
-  percent_histogram_chart.append("g")
-      .attr("transform", "translate(" + (margin.left + (margin.right/2)) + ", " + (height) + ")")
-      .call(d3.axisBottom(bar_x).ticks(histogram_right_max * 4));
-
-    // text label for the x axis
-  percent_histogram_chart.append("text")             
-      .attr("transform",
-            "translate(" + ((width/2) + margin.left + (margin.right)) + " ," + 
-                           (height + 60) + ")")
-      .style("text-anchor", "middle")
-      .text("Percent Account Change");
-
-    // Add the y Axis
-  percent_histogram_chart.append("g")
-      .attr("transform", "translate(" + (margin.left + margin.right + (margin.left / 2)) + ", " + 0 + ")")
-      .call(d3.axisLeft(bar_y));
-
-  // text label for the y axis
-  percent_histogram_chart.append("text")
-      .attr("transform", "rotate(-90)")
-      .attr("y", 0)
-      .attr("x",0 - (height/2))
-      .attr("dy", "1em")
-      .style("text-anchor", "middle")
-      .text("Days");
-
-
-   // Add the valueBar bar
-   percent_histogram_chart.selectAll("rect")
-      .data(bins)
-      .enter().append("rect")
-      .attr("class", "bar")
-      .attr("x", d => bar_x_axis(d.x0) + (margin.left + (margin.right/2)))
-      .attr("y", function(d) { /*console.log(d.length);*/ return bar_y_axis(d.length); })
-      .attr("height", function(d) { return height - bar_y_axis(d.length); })
-      .attr("width", d => Math.max(0, bar_x_axis(d.x1) - bar_x_axis(d.x0) - 1))
-      .attr("fill", function(d) {return colorOfBar(d.x0);});
-
-    percent_histogram_chart.append("text")
-      .attr("x", 0 + (outerWidth/2))
-      .attr("y", 0)
-      .style("text-anchor", "middle")
-      .text("Number of Days per Percentage Change Range");
-
-
-      //Percentage Change Line Graph
-    percent_line_x_domain = d3.extent(DailyPercentageChangesWithDates, function(d, i) { return d.date; });
-    percent_line_y_domain = [d3.min(DailyPercentageChangesWithDates, function(d, i) { return d.change; }), d3.max(DailyPercentageChangesWithDates, function(d, i) { return d.change; })];
-
-    percent_line_x.domain(percent_line_x_domain);
-    percent_line_y.domain(percent_line_y_domain);
-
-    var percent_g = percent_change_chart.append("g")
-      .attr("transform", "translate(" + padding.left + "," + padding.top + ")");
-
-        // Add the percentline path.
-  percent_g.append("path")
-      .data([DailyPercentageChangesWithDates])
-      .attr("class", "line")
-      .attr("d", percentline)
-      .attr("fill", "none")
-      .attr("stroke", "blue")
-      .attr("stroke-width", 1.5);
-
-  percent_line_xAxis = d3.axisBottom(percent_line_x);
-
-    // Add the x Axis
-  percent_g.append("g")
-    .attr("class", "axis axis--x")
-    .attr("transform", "translate(0," + height + ")")
-    .call(percent_line_xAxis);
-
-    // text label for the x axis
-  percent_g.append("text")             
-      .attr("transform",
-            "translate(" + ((width/2) + margin.left) + " ," + 
-                           (height + (margin.bottom) + margin.top) + ")")
-      .style("text-anchor", "middle")
-      .text("Date");
-
-  percent_line_yAxis = d3.axisLeft(percent_line_y);
-
-    // Add the y Axis
-  percent_g.append("g")
-    .attr("class", "axis axis--y")
-    .attr("transform", "translate(" + margin.left + ",0)")
-    .call(percent_line_yAxis);
-
-  // text label for the y axis
-  percent_change_chart.append("text")
-      .attr("transform", "rotate(-90)")
-      .attr("y", 0 + (margin.left/4))
-      .attr("x",0 - (((height)/1.8) + margin.top + margin.bottom) )
-      .attr("dy", "1em")
-      .style("text-anchor", "middle")
-      .text("Percent");
-
-  percent_change_chart.append("text")
-      .attr("x", 0 + (outerWidth/2))
-      .attr("y", 0)
-      .style("text-anchor", "middle")
-      .text("Account Percentage Change By Day");
-
-  percent_change_chart.append("g")
-    .attr("class", "brush")
-    .call(percent_change_brush);
-
-  console.log("Before zoom: X: " + percent_line_x.range());
-  console.log("Before zoom: Y: " + percent_line_y.range());
-
+    renderPercentChangeChart();
+      
 
   //Shares of each stock bought graph
   ClampSharesOfStockArray();
 
-  // Scale the range of the data
-var shares_x = d3.scaleBand()
-    .range([margin.left, width]);
-
-  // var shares_x = d3.scaleOrdinal()
-  //   .range([margin.left, width]);
-
-  var shares_x_axis = shares_x.domain(RenderedSharesOfStocks.map(function(d) { return d.stock; }));
-
-  var shares_y = d3.scaleLinear()
-    .range([height - margin.bottom, margin.top]);
-
-  var max = d3.max(RenderedSharesOfStocks, function(d) { return d.amount; });
-
-  var shares_y_axis = shares_y.domain([0, max]);
-
-  // Add the x Axis
-  shares_of_stocks_bought_chart.append("g")
-      .attr("transform", "translate(" + (margin.left + (margin.right/2)) + ", " + (height - margin.top) + ")")
-      .call(d3.axisBottom(shares_x))
-      .selectAll("text")  
-        .style("text-anchor", "end")
-        .attr("dx", "-.8em")
-        .attr("dy", "-.45em")
-        .attr("transform", "rotate(-90)");
-
-    // text label for the x axis
-  shares_of_stocks_bought_chart.append("text")             
-      .attr("transform",
-            "translate(" + ((width/2) + margin.left + (margin.right)) + " ," + 
-                           (height + 35) + ")")
-      .style("text-anchor", "middle")
-      .text("Stock");
-
-  // Add the y Axis
-  shares_of_stocks_bought_chart.append("g")
-      .attr("transform", "translate(" + (margin.left + margin.right + (margin.left / 2)) + ", " + 0 + ")")
-      .call(d3.axisLeft(shares_y));
-
-  // text label for the y axis
-  shares_of_stocks_bought_chart.append("text")
-      .attr("transform", "rotate(-45)")
-      .attr("y", 0)
-      .attr("x",0 - (height/2))
-      .attr("dy", "1em")
-      .style("text-anchor", "middle")
-      .text("Amount");
-
-  // Add the valueBar bar
-   shares_of_stocks_bought_chart.selectAll("rect")
-      .data(RenderedSharesOfStocks)
-      .enter().append("rect")
-      .attr("class", "bar")
-      .attr("x", d => shares_x_axis(d.stock)  + (margin.left + (margin.right/2)))
-      .attr("y", function(d) { return shares_y_axis(d.amount); })
-      .attr("height", function(d) { return height - shares_y_axis(d.amount) - margin.top; })
-      .attr("width", shares_x.bandwidth())
-      .attr("fill", "purple");
-
-    shares_of_stocks_bought_chart.append("text")
-      .attr("x", 0 + (outerWidth/2))
-      .attr("y", 0)
-      .style("text-anchor", "middle")
-      .text("Top 50 Most Purchased Stocks");
-//"blue"function(d) {return colorOfShares(d.amount, max);}
-
-    text_object.append("text")
-        .attr("x", ((width + margin.left)/2))             
-        .attr("y", 0 + 30)
-        .attr("text-anchor", "middle")  
-        .style("font-size", "25px") 
-        .style("text-decoration", "underline")  
-        .text("Starting Money: " + startingMoney);
-
-    text_object.append("text")
-        .attr("x", ((width + margin.left)/2))             
-        .attr("y", 0 + 60)
-        .attr("text-anchor", "middle")  
-        .style("font-size", "25px") 
-        .style("text-decoration", "underline")  
-        .text("Ending Money: " + (currentMoney + stockValue));
-
-    text_object.append("text")
-        .attr("x", ((width + margin.left)/2))             
-        .attr("y", 0 + 90)
-        .attr("text-anchor", "middle")  
-        .style("font-size", "25px") 
-        .style("text-decoration", "underline")  
-        .text("Account Percentage Gain: " + AccountPercentageGain);
-
-    text_object.append("text")
-        .attr("x", ((width + margin.left)/2))             
-        .attr("y", 0 + 120)
-        .attr("text-anchor", "middle")  
-        .style("font-size", "25px") 
-        .style("text-decoration", "underline")  
-        .text("Average Yearly Percentage Gain: " + YearlyPercentageGain);
-
-    text_object.append("text")
-        .attr("x", ((width + margin.left)/2))             
-        .attr("y", 0 + 150)
-        .attr("text-anchor", "middle")  
-        .style("font-size", "25px") 
-        .style("text-decoration", "underline")  
-        .text("Standard Deviation: " + YearlyStandardDeviation);
-
-    text_object.append("text")
-        .attr("x", ((width + margin.left)/2))             
-        .attr("y", 0 + 180)
-        .attr("text-anchor", "middle")  
-        .style("font-size", "25px") 
-        .style("text-decoration", "underline")  
-        .text("SPY Percentage Gain: " + SPYPercentageGain);
-
-    text_object.append("text")
-        .attr("x", ((width + margin.left)/2))             
-        .attr("y", 0 + 210)
-        .attr("text-anchor", "middle")  
-        .style("font-size", "25px") 
-        .style("text-decoration", "underline")  
-        .text("Max Drawdown Percentage: " + MaxDrawdownPercentage);
-
-    text_object.append("text")
-        .attr("x", ((width + margin.left)/2))             
-        .attr("y", 0 + 240)
-        .attr("text-anchor", "middle")  
-        .style("font-size", "25px") 
-        .style("text-decoration", "underline")  
-        .text("Sharpe Ratio: " + SharpeRatio);
-
+  renderSharesOfStocksChart();
 }
 
 //Percent change line chart brush
