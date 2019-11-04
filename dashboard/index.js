@@ -158,14 +158,16 @@ var percent_line_xAxis;
 var percent_line_yAxis;
 
 var percent_line_x_domain;
-var percent_line_y_domain; 
+var percent_line_y_domain;
 
-var percent_change_brush = d3.brush()
-    //.extent([percent_line_x.range()[0], percent_line_y.range()[0]], [percent_line_x.range()[1], percent_line_y.range()[1]])
-    .extent([ [padding.left + margin.left, padding.top + (margin.top)], [width + padding.left, height + padding.top] ])
-    .on("end", brushended),
-    idleTimeout,
-    idleDelay = 350;
+var percent_g;
+
+// var percent_change_brush = d3.brush()
+//     //.extent([percent_line_x.range()[0], percent_line_y.range()[0]], [percent_line_x.range()[1], percent_line_y.range()[1]])
+//     .extent([ [padding.left + margin.left, padding.top + (margin.top)], [width + padding.left, height + padding.top] ])
+//     .on("end", brushended),
+//     idleTimeout,
+//     idleDelay = 350;
 
 // define the line
 var moneyline = d3.line()
@@ -209,6 +211,11 @@ var text_object = d3.select(".text_at_bottom")
 var histogram_left_max = -8.0;
 var histogram_right_max = 8.0;
 
+var panningLeft = false;
+var panningRight = false;
+var beginningIndex = 0;
+var endingIndex = 80;
+
 var ResetVolatileData = function()
 {
   startingMoney = 100000;
@@ -233,6 +240,12 @@ var ResetVolatileData = function()
   DailyGain = [];
   SharesOfStocks = [];
   RenderedSharesOfStocks = [];
+
+  beginningIndex = 0;
+  endingIndex = 80;
+
+  panningRight = false;
+  panningLeft = false;
 
   //d3.select("body").selectAll("svg").remove();
 
@@ -408,21 +421,171 @@ function renderAccountValueChart()
       .text("Account Value Over Time");
 }
 
+
+
+var clearIntervalIDRight;
+var clearIntervalIDLeft;
+
+function panLeft()
+{
+  panningLeft = true;
+
+  clearIntervalIDLeft = setInterval(function(){panning();}, 100);
+}
+
+function stopPanLeft()
+{
+  panningLeft = false;
+
+  clearInterval(clearIntervalIDLeft);
+
+  console.log("Clearing left");
+}
+
+function panRight()
+{
+  panningRight = true;
+
+  clearIntervalIDRight = setInterval(function(){panning();}, 100);
+}
+
+function stopPanRight()
+{
+  panningRight = false;
+
+  clearInterval(clearIntervalIDRight);
+
+  console.log("Clearing right");
+}
+
+
+var percent_line_domain_beginning;
+var percent_line_domain_end;
+
+var renderPercentChangeArray = [];
+
+function initializeEndingIndex(value)
+{
+  if(DailyPercentageChangesWithDates.length <= value)
+  {
+    endingIndex = Math.round(value / 2);
+
+    initializeEndingIndex(endingIndex);
+  }
+}
+
+function panning()
+{
+  if(panningRight || panningLeft)
+  {
+    var t = percent_change_chart.transition().duration(750);
+
+    if(panningLeft)
+    {
+      console.log("Panning Left");
+      if(!(beginningIndex - 1 <= 0))
+      {
+        beginningIndex -= 1;
+        endingIndex -= 1;
+      }
+      else
+      {
+        return;
+      }
+    }
+    else if(panningRight)
+    {
+      console.log("Panning Right");
+      if(!(endingIndex + 1 >= DailyPercentageChangesWithDates.length - 1))
+      {
+        beginningIndex += 1;
+        endingIndex += 1;
+      }
+      else
+      {
+        return;
+      }
+    }
+
+    //percent_line_domain_beginning = DailyPercentageChangesWithDates[beginningIndex].date;
+    //percent_line_domain_end = DailyPercentageChangesWithDates[endingIndex].date;
+
+    // percent_line_x.domain([percent_line_domain_beginning, percent_line_domain_end]);
+
+    // percent_change_chart.select(".axis--x").transition(t).call(percent_line_xAxis);
+
+    // percent_change_chart.selectAll(".line").transition(t)
+    //       .attr("d", percentline);
+
+    renderPercentChangeArray = [];
+
+    clearChart("account_percentage_change_line_chart");
+    percent_change_chart = d3.select(".account_percentage_change_line_chart")
+    .attr("width", outerWidth)
+    .attr("height", outerHeight)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    renderPercentChangeChart();
+  } 
+}
+
+//Percent change line chart brush
+// function brushended() {
+//   var s = d3.event.selection;
+//   if (!s) {
+//     if (!idleTimeout) return idleTimeout = setTimeout(idled, idleDelay);
+//     percent_line_x.domain(percent_line_x_domain);
+//     percent_line_y.domain(percent_line_y_domain);
+//   } else {
+//     percent_line_x.domain([s[0][0], s[1][0]].map(percent_line_x.invert, percent_line_x));
+//     percent_line_y.domain([s[1][1], s[0][1]].map(percent_line_y.invert, percent_line_y));
+//     percent_change_chart.select(".brush").call(percent_change_brush.move, null);
+//   }
+//   zoom();
+// }
+
+// function idled() {
+//   idleTimeout = null;
+// }
+
+// function zoom() {
+//   var t = percent_change_chart.transition().duration(750);
+//   percent_change_chart.select(".axis--x").transition(t).call(percent_line_xAxis);
+//   percent_change_chart.select(".axis--y").transition(t).call(percent_line_yAxis);
+//   percent_change_chart.selectAll(".line").transition(t)
+//        .attr("d", percentline);
+
+//   console.log("After zoom: X: " + percent_line_x.range());
+//   console.log("After zoom: Y: " + percent_line_y.range());
+
+// }
+
 function renderPercentChangeChart()
 {
 //Percentage Change Line Graph
     percent_line_x_domain = d3.extent(DailyPercentageChangesWithDates, function(d, i) { return d.date; });
     percent_line_y_domain = [d3.min(DailyPercentageChangesWithDates, function(d, i) { return d.change; }), d3.max(DailyPercentageChangesWithDates, function(d, i) { return d.change; })];
 
-    percent_line_x.domain(percent_line_x_domain);
+    percent_line_domain_beginning = DailyPercentageChangesWithDates[beginningIndex].date;
+    percent_line_domain_end = DailyPercentageChangesWithDates[endingIndex].date;
+
+    renderPercentChangeArray = DailyPercentageChangesWithDates.slice(beginningIndex, endingIndex);
+
+    //percent_line_x.domain(percent_line_x_domain);
+    percent_line_x.domain([percent_line_domain_beginning, percent_line_domain_end]);
     percent_line_y.domain(percent_line_y_domain);
 
     var percent_g = percent_change_chart.append("g")
       .attr("transform", "translate(" + padding.left + "," + padding.top + ")");
 
+  //percent_change_chart.transition().duration(750);
+
         // Add the percentline path.
-  percent_g.append("path")
-      .data([DailyPercentageChangesWithDates])
+  percent_g.attr("class", "charts")
+      .append("path")
+      //.data([DailyPercentageChangesWithDates])
+      .data([renderPercentChangeArray])
       .attr("class", "line")
       .attr("d", percentline)
       .attr("fill", "none")
@@ -468,12 +631,13 @@ function renderPercentChangeChart()
       .style("text-anchor", "middle")
       .text("Account Percentage Change By Day");
 
-  percent_change_chart.append("g")
-    .attr("class", "brush")
-    .call(percent_change_brush);
+      //Brush
+  // percent_change_chart.append("g")
+  //   .attr("class", "brush")
+  //   .call(percent_change_brush);
 
-  console.log("Before zoom: X: " + percent_line_x.range());
-  console.log("Before zoom: Y: " + percent_line_y.range());
+  // console.log("Before zoom: X: " + percent_line_x.range());
+  // console.log("Before zoom: Y: " + percent_line_y.range());
 
 }
 
@@ -612,51 +776,6 @@ function renderTextData()
         .style("text-decoration", "underline")  
         .text("Sharpe Ratio: " + SharpeRatio);
 }
-
-
-// var changeStartDate = function(p_date)
-// {
-//   var start_date = p_date.value;
-//   var end_calendar = document.getElementById('end');
-
-//   var d1 = Date.parse(start_date);
-//   var d2 = Date.parse(end_calendar.value);
-  
-//   if (d1 > d2)
-//   {
-//     //confirm ("Start Date is after End Date");
-//     goodToRun = false;
-//   }
-//   else
-//   {
-//     goodToRun = true;
-
-//     startDate = start_date;
-//     endDate = end_calendar.value;
-//   }
-// }
-
-// var changeEndDate = function(p_date)
-// {
-//   var end_date = p_date.value;
-//   var start_calendar = document.getElementById('start');
-
-//   var d1 = Date.parse(end_date);
-//   var d2 = Date.parse(start_calendar.value);
-  
-//   if (d1 < d2)
-//   {
-//     //confirm ("Start Date is after End Date");
-//     goodToRun = false;
-//   }
-//   else
-//   {
-//     goodToRun = true;
-
-//     startDate = start_calendar.value;
-//     endDate = end_date;
-//   }
-// }
 
 function colorOfBar(percent)
 {
@@ -811,6 +930,8 @@ function main(data)
     //Remove loading text
     jQuery("#loading").toggle();
 
+    //Setup percent line ending index
+    initializeEndingIndex(endingIndex);
 
     //Render The Graphs
     renderAccountValueChart();
@@ -827,35 +948,35 @@ function main(data)
 }
 
 //Percent change line chart brush
-function brushended() {
-  var s = d3.event.selection;
-  if (!s) {
-    if (!idleTimeout) return idleTimeout = setTimeout(idled, idleDelay);
-    percent_line_x.domain(percent_line_x_domain);
-    percent_line_y.domain(percent_line_y_domain);
-  } else {
-    percent_line_x.domain([s[0][0], s[1][0]].map(percent_line_x.invert, percent_line_x));
-    percent_line_y.domain([s[1][1], s[0][1]].map(percent_line_y.invert, percent_line_y));
-    percent_change_chart.select(".brush").call(percent_change_brush.move, null);
-  }
-  zoom();
-}
+// function brushended() {
+//   var s = d3.event.selection;
+//   if (!s) {
+//     if (!idleTimeout) return idleTimeout = setTimeout(idled, idleDelay);
+//     percent_line_x.domain(percent_line_x_domain);
+//     percent_line_y.domain(percent_line_y_domain);
+//   } else {
+//     percent_line_x.domain([s[0][0], s[1][0]].map(percent_line_x.invert, percent_line_x));
+//     percent_line_y.domain([s[1][1], s[0][1]].map(percent_line_y.invert, percent_line_y));
+//     percent_change_chart.select(".brush").call(percent_change_brush.move, null);
+//   }
+//   zoom();
+// }
 
-function idled() {
-  idleTimeout = null;
-}
+// function idled() {
+//   idleTimeout = null;
+// }
 
-function zoom() {
-  var t = percent_change_chart.transition().duration(750);
-  percent_change_chart.select(".axis--x").transition(t).call(percent_line_xAxis);
-  percent_change_chart.select(".axis--y").transition(t).call(percent_line_yAxis);
-  percent_change_chart.selectAll(".line").transition(t)
-       .attr("d", percentline);
+// function zoom() {
+//   var t = percent_change_chart.transition().duration(750);
+//   percent_change_chart.select(".axis--x").transition(t).call(percent_line_xAxis);
+//   percent_change_chart.select(".axis--y").transition(t).call(percent_line_yAxis);
+//   percent_change_chart.selectAll(".line").transition(t)
+//        .attr("d", percentline);
 
-  console.log("After zoom: X: " + percent_line_x.range());
-  console.log("After zoom: Y: " + percent_line_y.range());
+//   console.log("After zoom: X: " + percent_line_x.range());
+//   console.log("After zoom: Y: " + percent_line_y.range());
 
-}
+// }
 
 // Random strategy. Probability to buy each available stock each day. Sell after 60 days of ownership.
 function LinearlyWeightedMovingAverage(date, trendRange, threshold) {
