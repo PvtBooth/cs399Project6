@@ -939,6 +939,8 @@ function main(data)
     renderPercentHistogramChart();
 
     renderPercentChangeChart();
+
+    renderTextData();
       
 
   //Shares of each stock bought graph
