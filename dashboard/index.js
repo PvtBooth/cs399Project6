@@ -145,10 +145,10 @@ var margin = {top: 20, right: 20, bottom: 20, left: 20},
     width = innerWidth - padding.left - padding.right,
     height = innerHeight - padding.top - padding.bottom;
 
-var text_margin = {top: 20, right: 20, bottom: 20, left: 20},
-    text_padding = {top: 60, right: 60, bottom: 60, left: 60},
-    text_outerWidth = 941,
-    text_outerHeight = 500,
+var text_margin = {top: 10, right: 10, bottom: 10, left: 10},
+    text_padding = {top: 10, right: 10, bottom: 10, left: 10},
+    text_outerWidth = 400,
+    text_outerHeight = 100,
     text_innerWidth = text_outerWidth - text_margin.left - text_margin.right,
     text_innerHeight = text_outerHeight - text_margin.top - text_margin.bottom,
     text_width = text_innerWidth - text_padding.left - text_padding.right,
@@ -896,75 +896,67 @@ var shares_x = d3.scaleBand()
 function renderTextData()
 {
   starting_money_graph.append("text")
-        .attr("x", ((width + margin.left)/2))             
-        .attr("y", 0 + 30)
+        .attr("x", 0)             
+        .attr("y", 0)
         .attr("text-anchor", "middle")  
-        .style("font-size", "25px") 
-        .style("text-decoration", "underline")  
+        .style("font-size", "16px")
         .text("Starting Money: " + startingMoney);
 
     ending_money_graph.append("text")
-        .attr("x", ((width + margin.left)/2))             
-        .attr("y", 0 + 60)
+        .attr("x", 0)             
+        .attr("y", 0)
         .attr("text-anchor", "middle")  
-        .style("font-size", "25px") 
-        .style("text-decoration", "underline")  
+        .style("font-size", "16px")
         .text("Ending Money: " + (currentMoney + stockValue));
 
     account_percentage_gain_graph.append("text")
-        .attr("x", ((width + margin.left)/2))             
-        .attr("y", 0 + 90)
+        .attr("x", 0)             
+        .attr("y", 0)
         .attr("text-anchor", "middle")  
-        .style("font-size", "25px") 
-        .style("text-decoration", "underline")  
+        .style("font-size", "16px")
         .text("Account Percentage Gain: " + AccountPercentageGain);
 
     average_yearly_percentage_gain_graph.append("text")
-        .attr("x", ((width + margin.left)/2))             
-        .attr("y", 0 + 120)
+        .attr("x", 0)             
+        .attr("y", 0)
         .attr("text-anchor", "middle")  
-        .style("font-size", "25px") 
-        .style("text-decoration", "underline")  
+        .style("font-size", "16px")
         .text("Average Yearly Percentage Gain: " + YearlyPercentageGain);
 
     standard_deviation_graph.append("text")
-        .attr("x", ((width + margin.left)/2))             
-        .attr("y", 0 + 150)
+        .attr("x", 0)             
+        .attr("y", 0)
         .attr("text-anchor", "middle")  
-        .style("font-size", "25px") 
+        .style("font-size", "16px") 
         .style("text-decoration", "underline")  
         .text("Standard Deviation: " + YearlyStandardDeviation);
 
     spy_percentage_gain_graph.append("text")
-        .attr("x", ((width + margin.left)/2))             
-        .attr("y", 0 + 180)
+        .attr("x", 0)             
+        .attr("y", 0)
         .attr("text-anchor", "middle")  
-        .style("font-size", "25px") 
-        .style("text-decoration", "underline")  
+        .style("font-size", "16px")
         .text("SPY Percentage Gain: " + SPYPercentageGain);
 
     max_drawdown_percentage_graph.append("text")
-        .attr("x", ((width + margin.left)/2))             
-        .attr("y", 0 + 210)
+        .attr("x", 0)             
+        .attr("y", 0)
         .attr("text-anchor", "middle")  
-        .style("font-size", "25px") 
-        .style("text-decoration", "underline")  
+        .style("font-size", "16px")
         .text("Max Drawdown Percentage: " + MaxDrawdownPercentage);
 
     sharpe_ratio_graph.append("text")
-        .attr("x", ((width + margin.left)/2))             
-        .attr("y", 0 + 240)
+        .attr("x", 0)             
+        .attr("y", 0)
         .attr("text-anchor", "middle")  
-        .style("font-size", "25px") 
-        .style("text-decoration", "underline")  
+        .style("font-size", "16px")
         .text("Sharpe Ratio: " + SharpeRatio);
 
     total_taxes_graph.append("text")
-        .attr("x", ((width + margin.left)/2))             
-        .attr("y", 0 + 270)
+        .attr("x", 0)             
+        .attr("y", 0)
         .attr("text-anchor", "middle")  
-        .style("font-size", "25px") 
-        .style("text-decoration", "underline")  
+        .style("font-size", "16px")
         .text("Total taxes: " + totalTax);
 }
 
