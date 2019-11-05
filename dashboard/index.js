@@ -219,58 +219,58 @@ var shares_of_stocks_bought_chart = d3.select(".stock_bar_chart")
 
 //Text objects
 var starting_money_graph = d3.select(".starting_money_graph")
-    .attr("width", outerWidth)
-    .attr("height", outerHeight)
+    .attr("width", text_outerWidth)
+    .attr("height", text_outerHeight)
     .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    .attr("transform", "translate(" + text_margin.left + "," + text_margin.top + ")");
 
 var ending_money_graph = d3.select(".ending_money_graph")
-    .attr("width", outerWidth)
-    .attr("height", outerHeight)
+    .attr("width", text_outerWidth)
+    .attr("height", text_outerHeight)
     .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    .attr("transform", "translate(" + text_margin.left + "," + text_margin.top + ")");
 
 var account_percentage_gain_graph = d3.select(".account_percentage_gain_graph")
-    .attr("width", outerWidth)
-    .attr("height", outerHeight)
+    .attr("width", text_outerWidth)
+    .attr("height", text_outerHeight)
     .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    .attr("transform", "translate(" + text_margin.left + "," + text_margin.top + ")");
 
 var average_yearly_percentage_gain_graph = d3.select(".average_yearly_percentage_gain_graph")
-    .attr("width", outerWidth)
-    .attr("height", outerHeight)
+    .attr("width", text_outerWidth)
+    .attr("height", text_outerHeight)
     .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    .attr("transform", "translate(" + text_margin.left + "," + text_margin.top + ")");
 
 var standard_deviation_graph = d3.select(".standard_deviation_graph")
-    .attr("width", outerWidth)
-    .attr("height", outerHeight)
+    .attr("width", text_outerWidth)
+    .attr("height", text_outerHeight)
     .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    .attr("transform", "translate(" + text_margin.left + "," + text_margin.top + ")");
 
 var spy_percentage_gain_graph = d3.select(".spy_percentage_gain_graph")
-    .attr("width", outerWidth)
-    .attr("height", outerHeight)
+    .attr("width", text_outerWidth)
+    .attr("height", text_outerHeight)
     .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    .attr("transform", "translate(" + text_margin.left + "," + text_margin.top + ")");
 
 var max_drawdown_percentage_graph = d3.select(".max_drawdown_percentage_graph")
-    .attr("width", outerWidth)
-    .attr("height", outerHeight)
+    .attr("width", text_outerWidth)
+    .attr("height", text_outerHeight)
     .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    .attr("transform", "translate(" + text_margin.left + "," + text_margin.top + ")");
 
 var sharpe_ratio_graph = d3.select(".sharpe_ratio_graph")
-    .attr("width", outerWidth)
-    .attr("height", outerHeight)
+    .attr("width", text_outerWidth)
+    .attr("height", text_outerHeight)
     .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    .attr("transform", "translate(" + text_margin.left + "," + text_margin.top + ")");
 
 var total_taxes_graph = d3.select(".total_taxes_graph")
-    .attr("width", outerWidth)
-    .attr("height", outerHeight)
+    .attr("width", text_outerWidth)
+    .attr("height", text_outerHeight)
     .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    .attr("transform", "translate(" + text_margin.left + "," + text_margin.top + ")");
 
 
 var histogram_left_max = -8.0;
