@@ -61,6 +61,10 @@ body {
   font-size: 16px;
 }
 
+.menu {
+  background-color: darkgrey;
+}
+
 label {
     display: block;
     font: 1rem 'Fira Sans', sans-serif;
