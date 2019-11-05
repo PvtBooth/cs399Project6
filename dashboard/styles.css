@@ -37,6 +37,30 @@
   100% { transform: rotate(360deg); }
 }
 
+body {
+  
+}
+
+.graphs {
+  background: darkgrey;
+}
+
+.svg {
+  position: static;
+  background: gray;
+}
+
+.button {
+  background-color: #4CAF50; /* Green */
+  border: none;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  text-decoration: none;
+  display: inline-block;
+  font-size: 16px;
+}
+
 label {
     display: block;
     font: 1rem 'Fira Sans', sans-serif;

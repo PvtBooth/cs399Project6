@@ -17,44 +17,40 @@
 
     <span id = "loading"> Loading... <div class="loader"></div> </span>
     
-    <button type="button" onclick="startSimulation()">Start Simulation</button>
-
-    <select onchange="changeStrategy(this.value)">
-      <option value="s0">LWMA Method</option>
-      <option value="s1">Mean Reversion Method</option>
-      <option value="s2">Random Strategy</option>
-    </select>
+    <div class = "strategy">
+    <label for="strategy_selector">Select Strategy:
+      <select onchange="changeStrategy(this.value)">
+        <option value="s0">LWMA Method</option>
+        <option value="s1">Mean Reversion Method</option>
+        <option value="s2">Random Strategy</option>
+      </select>
+    </label>
+    </div>
 
     <!-- Fancy Calendar -->
-    <label for="start">Start date:
-      <input type="text" id="start-date">
-    </label>
+    <div class="dates">
+      <label for="start">Start date:
+        <input type="text" id="start-date">
+      </label>
 
-    <label for="end">End date:
-      <input type="text" id="end-date">
-    </label>
-
-    <!-- HTML Calendar -->
-<!--     <label for="start">Start date:
-          <input type="date" onchange="changeStartDate(this)" id="start" name="date-start"
-            value="2009-01-02"
-            min="2009-01-02" max="2019-10-11">
-    </label>
-    <label for="end">End date:
-               <input type="date" onchange="changeEndDate(this)" id="end" name="date-end"
-                  value="2019-10-11"
-                  min="2009-01-02" max="2019-10-11">
-    </label> -->
+      <label for="end">End date:
+        <input type="text" id="end-date">
+      </label>
+    </div>
+    
+    <button type="button" class="button" onclick="startSimulation()">Start Simulation</button>
 
     <!-- SVGs -->
-    <svg class="percentage_histogram" id="percentage_histogram"></svg>
-    <svg class="account_value_line_chart" id="account_value_line_chart"></svg>
-    <svg class="account_percentage_change_line_chart" id="account_percentage_change_line_chart"></svg>
-    <svg class="stock_bar_chart" id="stock_bar_chart"></svg>
-    <svg class="text_at_bottom" id="text_at_bottom"></svg>
+    <div class="graphs">
+      <svg class="svg percentage_histogram" id="percentage_histogram"></svg>
+      <svg class="svg account_value_line_chart" id="account_value_line_chart"></svg>
+      <svg class="svg account_percentage_change_line_chart" id="account_percentage_change_line_chart"></svg>
+      <svg class="svg stock_bar_chart" id="stock_bar_chart"></svg>
+      
+    </div>
 
+    <svg class="text_at_bottom" id="text_at_bottom"></svg>
+    
     <script src="index.js"></script>
-<!--     <p style="margin-left: 303px;">People in their late teens and early 20s use hallucinogens more often than any other age range.</p>
-    <p style="margin-left: 303px;">Hey look two fraph</p> -->
   </body>
 </html>
