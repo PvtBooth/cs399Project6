@@ -106,6 +106,7 @@ var startDate = "2009-01-02";
 var endDate = "2019-10-11";
 
 var strategy = "s0";
+var taxBracket = "t0";
 var startingMoney = 100000;
 var currentMoney = startingMoney;
 var stockValue = 0;
@@ -123,6 +124,7 @@ var YearlyStandardDeviation = 0.0;
 var SharpeRatio = 0.0;
 var SPYPercentageGain = 0.0;
 var MaxDrawdownPercentage = 0.0;
+var totalTax = 0.0;
 
 //Graph vars
 var DailyAccountValue = [];
@@ -198,11 +200,69 @@ var shares_of_stocks_bought_chart = d3.select(".stock_bar_chart")
     .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-var text_object = d3.select(".text_at_bottom")
+// var text_object = d3.select(".text_at_bottom")
+//     .attr("width", outerWidth)
+//     .attr("height", outerHeight)
+//     .append("g")
+//     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+
+
+//Text objects
+var starting_money_graph = d3.select(".starting_money_graph")
     .attr("width", outerWidth)
     .attr("height", outerHeight)
     .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+var ending_money_graph = d3.select(".ending_money_graph")
+    .attr("width", outerWidth)
+    .attr("height", outerHeight)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+var account_percentage_gain_graph = d3.select(".account_percentage_gain_graph")
+    .attr("width", outerWidth)
+    .attr("height", outerHeight)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+var average_yearly_percentage_gain_graph = d3.select(".average_yearly_percentage_gain_graph")
+    .attr("width", outerWidth)
+    .attr("height", outerHeight)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+var standard_deviation_graph = d3.select(".standard_deviation_graph")
+    .attr("width", outerWidth)
+    .attr("height", outerHeight)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+var spy_percentage_gain_graph = d3.select(".spy_percentage_gain_graph")
+    .attr("width", outerWidth)
+    .attr("height", outerHeight)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+var max_drawdown_percentage_graph = d3.select(".max_drawdown_percentage_graph")
+    .attr("width", outerWidth)
+    .attr("height", outerHeight)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+var sharpe_ratio_graph = d3.select(".sharpe_ratio_graph")
+    .attr("width", outerWidth)
+    .attr("height", outerHeight)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+var total_taxes_graph = d3.select(".total_taxes_graph")
+    .attr("width", outerWidth)
+    .attr("height", outerHeight)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
 
 var histogram_left_max = -8.0;
 var histogram_right_max = 8.0;
@@ -227,6 +287,7 @@ var ResetVolatileData = function()
   SharpeRatio = 0.0;
   SPYPercentageGain = 0.0;
   MaxDrawdownPercentage = 0.0;
+  totalTax = 0.0;
 
   DailyAccountValue = [];
   DailyPercentageChanges = [];
@@ -277,8 +338,64 @@ var ResetVolatileData = function()
     .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-  clearChart("text_at_bottom");
-  text_object = d3.select(".text_at_bottom")
+  clearChart("starting_money_graph");
+  starting_money_graph = d3.select(".starting_money_graph")
+    .attr("width", outerWidth)
+    .attr("height", outerHeight)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+  clearChart("ending_money_graph");
+  ending_money_graph = d3.select(".ending_money_graph")
+    .attr("width", outerWidth)
+    .attr("height", outerHeight)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    clearChart("account_percentage_gain_graph");
+  account_percentage_gain_graph = d3.select(".account_percentage_gain_graph")
+    .attr("width", outerWidth)
+    .attr("height", outerHeight)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    clearChart("average_yearly_percentage_gain_graph");
+  average_yearly_percentage_gain_graph = d3.select(".average_yearly_percentage_gain_graph")
+    .attr("width", outerWidth)
+    .attr("height", outerHeight)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    clearChart("standard_deviation_graph");
+  standard_deviation_graph = d3.select(".standard_deviation_graph")
+    .attr("width", outerWidth)
+    .attr("height", outerHeight)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    clearChart("spy_percentage_gain_graph");
+  spy_percentage_gain_graph = d3.select(".spy_percentage_gain_graph")
+    .attr("width", outerWidth)
+    .attr("height", outerHeight)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    clearChart("max_drawdown_percentage_graph");
+  max_drawdown_percentage_graph = d3.select(".max_drawdown_percentage_graph")
+    .attr("width", outerWidth)
+    .attr("height", outerHeight)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    clearChart("sharpe_ratio_graph");
+  sharpe_ratio_graph = d3.select(".sharpe_ratio_graph")
+    .attr("width", outerWidth)
+    .attr("height", outerHeight)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+    clearChart("total_taxes_graph");
+  total_taxes_graph = d3.select(".total_taxes_graph")
     .attr("width", outerWidth)
     .attr("height", outerHeight)
     .append("g")
@@ -293,6 +410,56 @@ function clearChart(chartName)
 var changeStrategy = function(p_strategy)
 {
   strategy = p_strategy;
+}
+
+var changeTax = function(p_tax)
+{
+  taxBracket = p_tax;
+}
+
+function giveTaxPercentage(p_tax)
+{
+  if(p_tax == "t0")
+  {
+    return 0.10;
+  }
+  if(p_tax == "t1")
+  {
+    return 0.12;
+  }
+  if(p_tax == "t2")
+  {
+    return 0.22;
+  }
+  if(p_tax == "t3")
+  {
+    return 0.24;
+  }
+  if(p_tax == "t4")
+  {
+    return 0.32;
+  }
+  if(p_tax == "t5")
+  {
+    return 0.35;
+  }
+  if(p_tax == "t6")
+  {
+    return 0.37;
+  }
+
+}
+
+function calculateTaxes()
+{
+  var moneyMade = (currentMoney + stockValue) - (startingMoney);
+
+  if(moneyMade > 0)
+  {
+    var taxPercentage = giveTaxPercentage(taxBracket);
+
+    totalTax = moneyMade * taxPercentage;
+  }
 }
 
 function renderPercentHistogramChart()
@@ -719,7 +886,7 @@ var shares_x = d3.scaleBand()
 
 function renderTextData()
 {
-  text_object.append("text")
+  starting_money_graph.append("text")
         .attr("x", ((width + margin.left)/2))             
         .attr("y", 0 + 30)
         .attr("text-anchor", "middle")  
@@ -727,7 +894,7 @@ function renderTextData()
         .style("text-decoration", "underline")  
         .text("Starting Money: " + startingMoney);
 
-    text_object.append("text")
+    ending_money_graph.append("text")
         .attr("x", ((width + margin.left)/2))             
         .attr("y", 0 + 60)
         .attr("text-anchor", "middle")  
@@ -735,7 +902,7 @@ function renderTextData()
         .style("text-decoration", "underline")  
         .text("Ending Money: " + (currentMoney + stockValue));
 
-    text_object.append("text")
+    account_percentage_gain_graph.append("text")
         .attr("x", ((width + margin.left)/2))             
         .attr("y", 0 + 90)
         .attr("text-anchor", "middle")  
@@ -743,7 +910,7 @@ function renderTextData()
         .style("text-decoration", "underline")  
         .text("Account Percentage Gain: " + AccountPercentageGain);
 
-    text_object.append("text")
+    average_yearly_percentage_gain_graph.append("text")
         .attr("x", ((width + margin.left)/2))             
         .attr("y", 0 + 120)
         .attr("text-anchor", "middle")  
@@ -751,7 +918,7 @@ function renderTextData()
         .style("text-decoration", "underline")  
         .text("Average Yearly Percentage Gain: " + YearlyPercentageGain);
 
-    text_object.append("text")
+    standard_deviation_graph.append("text")
         .attr("x", ((width + margin.left)/2))             
         .attr("y", 0 + 150)
         .attr("text-anchor", "middle")  
@@ -759,7 +926,7 @@ function renderTextData()
         .style("text-decoration", "underline")  
         .text("Standard Deviation: " + YearlyStandardDeviation);
 
-    text_object.append("text")
+    spy_percentage_gain_graph.append("text")
         .attr("x", ((width + margin.left)/2))             
         .attr("y", 0 + 180)
         .attr("text-anchor", "middle")  
@@ -767,7 +934,7 @@ function renderTextData()
         .style("text-decoration", "underline")  
         .text("SPY Percentage Gain: " + SPYPercentageGain);
 
-    text_object.append("text")
+    max_drawdown_percentage_graph.append("text")
         .attr("x", ((width + margin.left)/2))             
         .attr("y", 0 + 210)
         .attr("text-anchor", "middle")  
@@ -775,13 +942,21 @@ function renderTextData()
         .style("text-decoration", "underline")  
         .text("Max Drawdown Percentage: " + MaxDrawdownPercentage);
 
-    text_object.append("text")
+    sharpe_ratio_graph.append("text")
         .attr("x", ((width + margin.left)/2))             
         .attr("y", 0 + 240)
         .attr("text-anchor", "middle")  
         .style("font-size", "25px") 
         .style("text-decoration", "underline")  
         .text("Sharpe Ratio: " + SharpeRatio);
+
+    total_taxes_graph.append("text")
+        .attr("x", ((width + margin.left)/2))             
+        .attr("y", 0 + 270)
+        .attr("text-anchor", "middle")  
+        .style("font-size", "25px") 
+        .style("text-decoration", "underline")  
+        .text("Total taxes: " + totalTax);
 }
 
 function colorOfBar(percent)
@@ -938,6 +1113,7 @@ function main(data)
     YearlyStandardDeviation = DailyStandardDeviation*Math.sqrt(252);
     SharpeRatio = ((YearlyPercentageGain) - 0.035) / YearlyStandardDeviation;
     SPYPercentageGain = (GetPrice(endDate, " SPY") - GetPrice(startDate, " SPY")) * 100 / GetPrice(startDate, " SPY");
+    calculateTaxes();
     
 
     //Remove loading text
