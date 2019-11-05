@@ -88,20 +88,14 @@
   position: relative;
   flex-grow: 1;
   
-  left: 50px;
-  
   margin-top: auto;
   margin-bottom: auto;
 }
 
-.info_text {
-  text-align: center;
-}
-
 .pan {
-  position: relative;
+  position: absolute;
   left: 1100px;
-  bottom: 495px;
+  bottom: 790px;
   width: 145px;
 }
 
