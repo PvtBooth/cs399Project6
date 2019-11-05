@@ -136,7 +136,7 @@ var RenderedSharesOfStocks = [];
 
 var margin = {top: 20, right: 20, bottom: 20, left: 20},
     padding = {top: 60, right: 60, bottom: 60, left: 60},
-    outerWidth = 941,
+    outerWidth = 910,
     outerHeight = 500,
     innerWidth = outerWidth - margin.left - margin.right,
     innerHeight = outerHeight - margin.top - margin.bottom,
