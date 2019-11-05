@@ -659,6 +659,15 @@ var shares_x = d3.scaleBand()
 
   var shares_y_axis = shares_y.domain([0, max]);
 
+  var tip = d3.tip()
+  .attr('class', 'd3-tip')
+  .offset([-10, 0])
+  .html(function(d) {
+    return "<center>" + d.stock + "</center>" + "<strong>Shares:</strong> <span style='color:magenta'>" + d.amount + "</span><br>" ;
+  })
+
+  shares_of_stocks_bought_chart.call(tip);
+
   // Add the x Axis
   shares_of_stocks_bought_chart.append("g")
       .attr("transform", "translate(" + (margin.left + (margin.right/2)) + ", " + (height - margin.top) + ")")
@@ -666,8 +675,8 @@ var shares_x = d3.scaleBand()
       .selectAll("text")  
         .style("text-anchor", "end")
         .attr("dx", "-.8em")
-        .attr("dy", "-.45em")
-        .attr("transform", "rotate(-90)");
+        .attr("dy", "-.15em")
+        .attr("transform", "rotate(-45)");
 
     // text label for the x axis
   shares_of_stocks_bought_chart.append("text")             
@@ -684,7 +693,7 @@ var shares_x = d3.scaleBand()
 
   // text label for the y axis
   shares_of_stocks_bought_chart.append("text")
-      .attr("transform", "rotate(-45)")
+      .attr("transform", "rotate(-90)")
       .attr("y", 0)
       .attr("x",0 - (height/2))
       .attr("dy", "1em")
@@ -692,15 +701,17 @@ var shares_x = d3.scaleBand()
       .text("Amount");
 
   // Add the valueBar bar
-   shares_of_stocks_bought_chart.selectAll("rect")
+   shares_of_stocks_bought_chart.selectAll(".shares_bar")
       .data(RenderedSharesOfStocks)
       .enter().append("rect")
-      .attr("class", "bar")
+      .attr("class", "shares_bar")
       .attr("x", d => shares_x_axis(d.stock)  + (margin.left + (margin.right/2)))
       .attr("y", function(d) { return shares_y_axis(d.amount); })
       .attr("height", function(d) { return height - shares_y_axis(d.amount) - margin.top; })
       .attr("width", shares_x.bandwidth())
-      .attr("fill", "purple");
+      //.attr("fill", "mediumorchid")
+      .on('mouseover', tip.show)
+      .on('mouseout', tip.hide);
 
     shares_of_stocks_bought_chart.append("text")
       .attr("x", 0 + (outerWidth/2))

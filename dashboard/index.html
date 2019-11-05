@@ -11,6 +11,9 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
     <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
 
+    <!-- Tooltip -->
+    <script src="d3-tip.js"></script>
+
   </head>
 
   <body>
@@ -35,18 +38,6 @@
       <input type="text" id="end-date">
     </label>
 
-    <!-- HTML Calendar -->
-<!--     <label for="start">Start date:
-          <input type="date" onchange="changeStartDate(this)" id="start" name="date-start"
-            value="2009-01-02"
-            min="2009-01-02" max="2019-10-11">
-    </label>
-    <label for="end">End date:
-               <input type="date" onchange="changeEndDate(this)" id="end" name="date-end"
-                  value="2019-10-11"
-                  min="2009-01-02" max="2019-10-11">
-    </label> -->
-
     <!-- SVGs -->
     <svg class="percentage_histogram" id="percentage_histogram"></svg>
     <svg class="account_value_line_chart" id="account_value_line_chart"></svg>
@@ -54,6 +45,7 @@
     <!-- <button type="button" onkeydown="panLeft(event)" onkeyup="stopPanLeft(event)">Pan Left</button>
     <button type="button" onkeydown="panRight(event)" onkeyup="stopPanRight(event)">Pan Right</button> -->
 
+    <!-- Buttons for panning -->
     <button type="button" onmousedown="panLeft()" onmouseup="stopPanLeft()">Pan Left</button>
     <button type="button" onmousedown="panRight()" onmouseup="stopPanRight()">Pan Right</button>
 
@@ -63,7 +55,6 @@
 
     <svg class="text_at_bottom" id="text_at_bottom"></svg>
 
-    <!-- Buttons for panning -->
 
 
     <script src="index.js"></script>
