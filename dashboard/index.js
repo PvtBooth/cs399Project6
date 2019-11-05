@@ -884,6 +884,8 @@ function main(data)
     DailyAccountValue.push({ date: new Date(dates[0]), money: currentMoney + stockValue });
     dateRange.forEach(function(date)
     {
+        console.log(date);
+
         if(strategy == "s0")
         {
           LinearlyWeightedMovingAverage(date, 20, 0.0001);
@@ -895,6 +897,10 @@ function main(data)
         else if(strategy == "s2")
         {
           RandomStrategy(date, 0.5); // almost 5 stocks per day
+        }
+        else if (strategy == "s3")
+        {
+            SimpleMovingAverageMethod(date, 50, 200, 1);
         }
 
 
@@ -980,7 +986,7 @@ function main(data)
 
 // }
 
-// Random strategy. Probability to buy each available stock each day. Sell after 60 days of ownership.
+
 function LinearlyWeightedMovingAverage(date, trendRange, threshold) {
   stocks.forEach(function(stock) {
       var val = GetPrice(date, stock);
@@ -1079,6 +1085,13 @@ function MeanMethod(date, threshold) {
                 var purchase = purchases[i];
                 if(purchase.stock != stock)
                     continue;
+
+                var purchase_date = new Date(purchase.date);
+                var current_date = new Date(date);
+                var diff = (current_date - purchase_date) / 86400000; // convert ms (dates) to days
+                if (diff < 90)
+                    continue;
+
                 var value = GetPrice(date, purchase.stock);
                 currentMoney += value;
                 //console.log("Selling a share of " + purchase.stock + " on " + date + " for " + value);
@@ -1140,6 +1153,77 @@ function RandomStrategy(date, probability) {
         }
     }
 }
+
+function SimpleMovingAverageMethod(date, MinTrend, MaxTrend, Amount) {
+    stocks.forEach(function(stock) {
+            var val = GetPrice(date, stock);
+            var dateIndex = dates.indexOf(date);
+            var currentDen = 0; var prevDen = 0;
+            var currentP = 0;  var prevP = 0;
+
+
+
+            // skip first 200 days
+            if(dateIndex < MaxTrend)
+            {
+                return;
+            }
+
+            for(var i = 0; i < MaxTrend; i++)
+            {
+                var newCurrentP = GetPrice(dates[dateIndex-i], stock);
+
+                //if not empty
+                if(newCurrentP > 0)
+                {
+                    currentDen++;
+                    currentP += newCurrentP;
+                }
+
+                if(i < MinTrend)
+                {
+                    var newPrevP = GetPrice(dates[dateIndex-i], stock);
+
+                    //if not empty
+                    if(newPrevP > 0)
+                    {
+                        prevDen++;
+                        prevP += newPrevP;
+                    }
+                }
+            }
+            var currentP = currentP/currentDen;
+            var prevP = prevP/prevDen;
+            // console.log("currentP = " + currentP);
+            // console.log("prevP = " + prevP);
+            if(currentP < prevP && currentMoney > (val * Amount))
+            {
+                purchases.push({ date: date, stock: stock, amount: Amount});
+                currentMoney -= val * Amount;
+                //Add back to shares
+                AddToSharesOfStockArray({ date: date, stock: stock, amount: Amount});
+                // console.log("Buying a share of " + stock + " on " + date + " for " + val);
+            }
+            else
+            {
+                var i = purchases.length;
+                while(i--) {
+                    var purchase = purchases[i];
+                    if(purchase.stock != stock || !HasPrice(date, stock))
+                        continue;
+                    var purchase_date = new Date(purchase.date);
+                    var current_date = new Date(date);
+                    var diff = (current_date - purchase_date) / 86400000; // convert ms (dates) to days
+                    if (diff < 90)
+                        continue;
+                    var value = GetPrice(date, purchase.stock);
+                    currentMoney += value;
+                    purchases.splice(i, 1);
+                    // console.log("Selling a share of " + purchase.stock + " on " + date + " for " + value);
+                }
+            }
+        }
+    )}
 
 // Get value of all owned stocks on a certain date
 function GetTotalStockValue(date){
