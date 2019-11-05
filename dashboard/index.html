@@ -43,15 +43,16 @@
     <div class="graphs">
       <svg class="svg account_value_line_chart" id="account_value_line_chart"></svg>
       <svg class="svg percentage_histogram" id="percentage_histogram"></svg>
-      
-      <!-- Buttons for panning -->
-      <button type="button" onmousedown="panLeft()" onmouseup="stopPanLeft()">Pan Left</button>
-      <button type="button" onmousedown="panRight()" onmouseup="stopPanRight()">Pan Right</button>
-
-      <svg class="svg account_percentage_change_line_chart" id="account_percentage_change_line_chart"></svg>
-      
       <svg class="svg stock_bar_chart" id="stock_bar_chart"></svg>
-      <svg class="svg text_at_bottom" id="text_at_bottom"></svg>
+      
+      <svg class="svg account_percentage_change_line_chart" id="account_percentage_change_line_chart"></svg>
+      <!-- Buttons for panning -->
+      <button class="pan" type="button" onmousedown="panLeft()" onmouseup="stopPanLeft()">Pan Left</button>
+      <button class="pan" type="button" onmousedown="panRight()" onmouseup="stopPanRight()">Pan Right</button>
+      
+      <div class="info_text">
+        <svg class="text_at_bottom" id="text_at_bottom"></svg>
+      </div>
     </div>
     
     

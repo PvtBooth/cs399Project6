@@ -134,13 +134,9 @@ var DailyGain = [];
 var SharesOfStocks = [];
 var RenderedSharesOfStocks = [];
 
-var old_margin = {top: 20, right: 30, bottom: 30, left: 80},
-    old_width = 1250 - old_margin.left - old_margin.right,
-    old_height = 550 - old_margin.top - old_margin.bottom;
-
 var margin = {top: 20, right: 20, bottom: 20, left: 20},
     padding = {top: 60, right: 60, bottom: 60, left: 60},
-    outerWidth = 960,
+    outerWidth = 940,
     outerHeight = 500,
     innerWidth = outerWidth - margin.left - margin.right,
     innerHeight = outerHeight - margin.top - margin.bottom,

@@ -51,7 +51,7 @@ body {
 }
 
 .button {
-  background-color: #4CAF50; /* Green */
+  background-color: black;
   border: none;
   color: white;
   padding: 15px 32px;
@@ -63,6 +63,16 @@ body {
 
 .menu {
   background-color: darkgrey;
+}
+
+.info_text {
+  text-align: center;
+}
+
+.pan {
+  position: relative;
+  left: 1100px;
+  bottom: 500px;
 }
 
 label {
