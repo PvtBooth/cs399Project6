@@ -19,46 +19,46 @@
   <body>
 
     <span id = "loading"> Loading... <div class="loader"></div> </span>
-    
-    <button type="button" onclick="startSimulation()">Start Simulation</button>
-
-    <select onchange="changeStrategy(this.value)">
-      <option value="s0">LWMA Short Trend</option>
-      <option value="s1">Mean Reversion</option>
-      <option value="s2">Random</option>
-      <option value="s3">SMA Bi-Trend</option>
-    </select>
 
     <!-- Fancy Calendar -->
-    <label for="start">Start date:
-      <input type="text" id="start-date">
-    </label>
+    <div class="menu">
+      <label for="strategy_selector">Select Strategy:
+      <select onchange="changeStrategy(this.value)">
+        <option value="s0">LWMA Short Trend</option>
+        <option value="s1">Mean Reversion</option>
+        <option value="s2">Random</option>
+        <option value="s3">SMA Bi-Trend</option>
+      </select>
+      </label>
+    
+      <label for="start">Start date:
+        <input type="text" id="start-date">
+      </label>
 
-    <label for="end">End date:
-      <input type="text" id="end-date">
-    </label>
+      <label for="end">End date:
+        <input type="text" id="end-date">
+      </label>
+      
+      <button type="button" class="button" onclick="startSimulation()">Start Simulation</button>
+    </div>
 
     <!-- SVGs -->
-    <svg class="percentage_histogram" id="percentage_histogram"></svg>
-    <svg class="account_value_line_chart" id="account_value_line_chart"></svg>
-
-    <!-- <button type="button" onkeydown="panLeft(event)" onkeyup="stopPanLeft(event)">Pan Left</button>
-    <button type="button" onkeydown="panRight(event)" onkeyup="stopPanRight(event)">Pan Right</button> -->
-
-    <!-- Buttons for panning -->
-    <button type="button" onmousedown="panLeft()" onmouseup="stopPanLeft()">Pan Left</button>
-    <button type="button" onmousedown="panRight()" onmouseup="stopPanRight()">Pan Right</button>
-
-    <svg class="account_percentage_change_line_chart" id="account_percentage_change_line_chart"></svg>
-
-    <svg class="stock_bar_chart" id="stock_bar_chart"></svg>
-
-    <svg class="text_at_bottom" id="text_at_bottom"></svg>
-
-
-
+    <div class="graphs">
+      <svg class="svg account_value_line_chart" id="account_value_line_chart"></svg>
+      <svg class="svg percentage_histogram" id="percentage_histogram"></svg>
+      <svg class="svg stock_bar_chart" id="stock_bar_chart"></svg>
+      
+      <svg class="svg account_percentage_change_line_chart" id="account_percentage_change_line_chart"></svg>
+      <!-- Buttons for panning -->
+      <button class="pan" type="button" onmousedown="panLeft()" onmouseup="stopPanLeft()">Pan Left</button>
+      <button class="pan" type="button" onmousedown="panRight()" onmouseup="stopPanRight()">Pan Right</button>
+      
+      <div class="info_text">
+        <svg class="text_at_bottom" id="text_at_bottom"></svg>
+      </div>
+    </div>
+    
+    
     <script src="index.js"></script>
-<!--     <p style="margin-left: 303px;">People in their late teens and early 20s use hallucinogens more often than any other age range.</p>
-    <p style="margin-left: 303px;">Hey look two fraph</p> -->
   </body>
 </html>
