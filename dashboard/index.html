@@ -17,29 +17,38 @@
   </head>
 
   <body>
-
-    <span id = "loading"> Loading... <div class="loader"></div> </span>
-
-    <!-- Fancy Calendar -->
-    <div class="menu">
-      <label for="strategy_selector">Select Strategy:
-      <select onchange="changeStrategy(this.value)">
-        <option value="s0">LWMA Short Trend</option>
-        <option value="s1">Mean Reversion</option>
-        <option value="s2">Random</option>
-        <option value="s3">SMA Bi-Trend</option>
-      </select>
-      </label>
     
-      <label for="start">Start date:
-        <input type="text" id="start-date">
-      </label>
+    <div class="menu">
+      <div class="item">
+        <button type="button" class="button" onclick="startSimulation()">Start Simulation</button>
+      </div>
 
-      <label for="end">End date:
-        <input type="text" id="end-date">
-      </label>
+      <!-- Fancy Calendar -->
+      <div class="item">
+        <label for="start">Start date:
+          <input type="text" id="start-date">
+        </label>
+
+        <label for="end">End date:&nbsp;
+          <input type="text" id="end-date">
+        </label>
+      </div>
+
+      <div class="item">
+        <label for="strategy_selector">Select Strategy:
+        <select onchange="changeStrategy(this.value)">
+          <option value="s0">LWMA Short Trend</option>
+          <option value="s1">Mean Reversion</option>
+          <option value="s2">Random</option>
+          <option value="s3">SMA Bi-Trend</option>
+        </select>
+        </label>
+      </div>
       
-      <button type="button" class="button" onclick="startSimulation()">Start Simulation</button>
+      <div class="loadingwheel">
+        <span id = "loading"> Loading... <div class="loader"></div> </span>
+      </div>
+
     </div>
 
     <!-- SVGs -->
@@ -49,10 +58,14 @@
       <svg class="svg stock_bar_chart" id="stock_bar_chart"></svg>
       
       <svg class="svg account_percentage_change_line_chart" id="account_percentage_change_line_chart"></svg>
-      <!-- Buttons for panning -->
-      <button class="pan" type="button" onmousedown="panLeft()" onmouseup="stopPanLeft()">Pan Left</button>
-      <button class="pan" type="button" onmousedown="panRight()" onmouseup="stopPanRight()">Pan Right</button>
       
+      <!-- Buttons for panning -->
+      <div class="pan">
+        <span class="tooltiptext">Hold</span>
+        <button type="button" onmousedown="panLeft()" onmouseup="stopPanLeft()">Pan Left</button>
+        <button type="button" onmousedown="panRight()" onmouseup="stopPanRight()">Pan Right</button>
+      </div>
+
       <div class="info_text">
         <svg class="text_at_bottom" id="text_at_bottom"></svg>
       </div>
