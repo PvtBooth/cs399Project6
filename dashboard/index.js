@@ -145,6 +145,15 @@ var margin = {top: 20, right: 20, bottom: 20, left: 20},
     width = innerWidth - padding.left - padding.right,
     height = innerHeight - padding.top - padding.bottom;
 
+var text_margin = {top: 20, right: 20, bottom: 20, left: 20},
+    text_padding = {top: 60, right: 60, bottom: 60, left: 60},
+    text_outerWidth = 941,
+    text_outerHeight = 500,
+    text_innerWidth = text_outerWidth - text_margin.left - text_margin.right,
+    text_innerHeight = text_outerHeight - text_margin.top - text_margin.bottom,
+    text_width = text_innerWidth - text_padding.left - text_padding.right,
+    text_height = text_innerHeight - text_padding.top - text_padding.bottom;
+
 // set the ranges
 var money_line_x = d3.scaleTime().range([margin.left, width]);
 var money_line_y = d3.scaleLinear().range([height, (margin.top)]);
@@ -336,70 +345,70 @@ var ResetVolatileData = function()
     .attr("width", outerWidth)
     .attr("height", outerHeight)
     .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    .attr("transform", "translate(" + margin.left + "," +margin.top + ")");
 
   clearChart("starting_money_graph");
   starting_money_graph = d3.select(".starting_money_graph")
-    .attr("width", outerWidth)
-    .attr("height", outerHeight)
+    .attr("width", text_outerWidth)
+    .attr("height", text_outerHeight)
     .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    .attr("transform", "translate(" + text_margin.left + "," + text_margin.top + ")");
 
   clearChart("ending_money_graph");
   ending_money_graph = d3.select(".ending_money_graph")
-    .attr("width", outerWidth)
-    .attr("height", outerHeight)
+    .attr("width", text_outerWidth)
+    .attr("height", text_outerHeight)
     .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    .attr("transform", "translate(" + text_margin.left + "," + text_margin.top + ")");
 
     clearChart("account_percentage_gain_graph");
   account_percentage_gain_graph = d3.select(".account_percentage_gain_graph")
-    .attr("width", outerWidth)
-    .attr("height", outerHeight)
+    .attr("width", text_outerWidth)
+    .attr("height", text_outerHeight)
     .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    .attr("transform", "translate(" + text_margin.left + "," + text_margin.top + ")");
 
     clearChart("average_yearly_percentage_gain_graph");
   average_yearly_percentage_gain_graph = d3.select(".average_yearly_percentage_gain_graph")
-    .attr("width", outerWidth)
-    .attr("height", outerHeight)
+    .attr("width", text_outerWidth)
+    .attr("height", text_outerHeight)
     .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    .attr("transform", "translate(" + text_margin.left + "," + text_margin.top + ")");
 
     clearChart("standard_deviation_graph");
   standard_deviation_graph = d3.select(".standard_deviation_graph")
-    .attr("width", outerWidth)
-    .attr("height", outerHeight)
+    .attr("width", text_outerWidth)
+    .attr("height", text_outerHeight)
     .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    .attr("transform", "translate(" + text_margin.left + "," + text_margin.top + ")");
 
     clearChart("spy_percentage_gain_graph");
   spy_percentage_gain_graph = d3.select(".spy_percentage_gain_graph")
-    .attr("width", outerWidth)
-    .attr("height", outerHeight)
+    .attr("width", text_outerWidth)
+    .attr("height", text_outerHeight)
     .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    .attr("transform", "translate(" + text_margin.left + "," + text_margin.top + ")");
 
     clearChart("max_drawdown_percentage_graph");
   max_drawdown_percentage_graph = d3.select(".max_drawdown_percentage_graph")
-    .attr("width", outerWidth)
-    .attr("height", outerHeight)
+    .attr("width", text_outerWidth)
+    .attr("height", text_outerHeight)
     .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    .attr("transform", "translate(" + text_margin.left + "," + text_margin.top + ")");
 
     clearChart("sharpe_ratio_graph");
   sharpe_ratio_graph = d3.select(".sharpe_ratio_graph")
-    .attr("width", outerWidth)
-    .attr("height", outerHeight)
+    .attr("width", text_outerWidth)
+    .attr("height", text_outerHeight)
     .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    .attr("transform", "translate(" + text_margin.left + "," + text_margin.top + ")");
 
     clearChart("total_taxes_graph");
   total_taxes_graph = d3.select(".total_taxes_graph")
-    .attr("width", outerWidth)
-    .attr("height", outerHeight)
+    .attr("width", text_outerWidth)
+    .attr("height", text_outerHeight)
     .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    .attr("transform", "translate(" + text_margin.left + "," + text_margin.top + ")");
 }
 
 function clearChart(chartName)
