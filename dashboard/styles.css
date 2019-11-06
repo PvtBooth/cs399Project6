@@ -75,7 +75,7 @@
 }
 
 .empty {
-  height: 120px;
+  height: 10px;
 }
 
 .button {
@@ -126,7 +126,7 @@
 .pan {
   position: absolute;
   left: 1100px;
-  bottom: 750px;
+  bottom: 79%;
   width: 145px;
 }
 
