@@ -15,7 +15,7 @@ const start_date_calendar = flatpickr('#start-date', {
 });
 
 const end_date_calendar = flatpickr('#end-date', {
-    "defaultDate": "2019-10-11",
+    "defaultDate": "2019-01-11",
     "dateFormat": "Y-m-d",
     "minDate": "2009-01-02",
     "maxDate": "2019-10-11",
@@ -145,10 +145,10 @@ var margin = {top: 20, right: 20, bottom: 20, left: 20},
     width = innerWidth - padding.left - padding.right,
     height = innerHeight - padding.top - padding.bottom;
 
-var text_margin = {top: 10, right: 10, bottom: 10, left: 10},
-    text_padding = {top: 10, right: 10, bottom: 10, left: 10},
-    text_outerWidth = 400,
-    text_outerHeight = 100,
+var text_margin = {top: 0, right: 0, bottom: 0, left: 0},
+    text_padding = {top: 0, right: 0, bottom: 0, left: 0},
+    text_outerWidth = 300,
+    text_outerHeight = 25,
     text_innerWidth = text_outerWidth - text_margin.left - text_margin.right,
     text_innerHeight = text_outerHeight - text_margin.top - text_margin.bottom,
     text_width = text_innerWidth - text_padding.left - text_padding.right,
@@ -881,7 +881,6 @@ var shares_x = d3.scaleBand()
       .attr("y", function(d) { return shares_y_axis(d.amount); })
       .attr("height", function(d) { return height - shares_y_axis(d.amount) - margin.top; })
       .attr("width", shares_x.bandwidth())
-      //.attr("fill", "mediumorchid")
       .on('mouseover', tip.show)
       .on('mouseout', tip.hide);
 
@@ -889,75 +888,73 @@ var shares_x = d3.scaleBand()
       .attr("x", 0 + (outerWidth/2))
       .attr("y", 0)
       .style("text-anchor", "middle")
-      .text("Top 50 Most Purchased Stocks");
-//"blue"function(d) {return colorOfShares(d.amount, max);}
+      .text("Top Most Purchased Stocks");
 }
 
 function renderTextData()
-{
+{ 
   starting_money_graph.append("text")
-        .attr("x", 0)             
-        .attr("y", 0)
-        .attr("text-anchor", "middle")  
+        .attr("x", 50)             
+        .attr("y", (text_height/2) + 5)
+        //.attr("text-anchor", "middle") 
         .style("font-size", "16px")
-        .text("Starting Money: " + startingMoney);
+        .text("Starting Money: " + d3.format("$,.2f")(startingMoney));
 
     ending_money_graph.append("text")
-        .attr("x", 0)             
-        .attr("y", 0)
-        .attr("text-anchor", "middle")  
+        .attr("x", 50)             
+        .attr("y", (text_height/2) + 5)
+        //.attr("text-anchor", "middle")  
         .style("font-size", "16px")
-        .text("Ending Money: " + (currentMoney + stockValue));
+        .text("Ending Money: " + d3.format("$,.2f")((currentMoney + stockValue)));
 
     account_percentage_gain_graph.append("text")
-        .attr("x", 0)             
-        .attr("y", 0)
-        .attr("text-anchor", "middle")  
+        .attr("x", 45)             
+        .attr("y", (text_height/2) + 5)
+        //.attr("text-anchor", "middle")  
         .style("font-size", "16px")
-        .text("Account Percentage Gain: " + AccountPercentageGain);
+        .text("Account Percentage Gain: " + d3.format(".2%")(AccountPercentageGain/100));
 
     average_yearly_percentage_gain_graph.append("text")
-        .attr("x", 0)             
-        .attr("y", 0)
-        .attr("text-anchor", "middle")  
+        .attr("x", 10)             
+        .attr("y", (text_height/2) + 5)
+        //.attr("text-anchor", "middle")  
         .style("font-size", "16px")
-        .text("Average Yearly Percentage Gain: " + YearlyPercentageGain);
+        .text("Average Yearly Percentage Gain: " + d3.format(".2%")(YearlyPercentageGain/100));
 
     standard_deviation_graph.append("text")
-        .attr("x", 0)             
-        .attr("y", 0)
-        .attr("text-anchor", "middle")  
-        .style("font-size", "16px") 
-        .style("text-decoration", "underline")  
-        .text("Standard Deviation: " + YearlyStandardDeviation);
+        .attr("x", 60)             
+        .attr("y", (text_height/2) + 5)
+        //.attr("text-anchor", "middle")  
+        .style("font-size", "16px")  
+        .text("Standard Deviation: " + d3.format(".2f")(YearlyStandardDeviation));
 
     spy_percentage_gain_graph.append("text")
-        .attr("x", 0)             
-        .attr("y", 0)
-        .attr("text-anchor", "middle")  
+        .attr("x", 50)             
+        .attr("y", (text_height/2) + 5)
+        //.attr("text-anchor", "middle")  
         .style("font-size", "16px")
-        .text("SPY Percentage Gain: " + SPYPercentageGain);
+        .text("SPY Percentage Gain: " + d3.format(".2%")(SPYPercentageGain/100));
 
     max_drawdown_percentage_graph.append("text")
-        .attr("x", 0)             
-        .attr("y", 0)
-        .attr("text-anchor", "middle")  
+        .attr("x", 30)             
+        .attr("y", (text_height/2) + 5)
+        //.attr("text-anchor", "middle")  
         .style("font-size", "16px")
-        .text("Max Drawdown Percentage: " + MaxDrawdownPercentage);
+        .text("Max Drawdown Percentage: " + d3.format(".2%")(MaxDrawdownPercentage/100));
 
     sharpe_ratio_graph.append("text")
-        .attr("x", 0)             
-        .attr("y", 0)
-        .attr("text-anchor", "middle")  
+        .attr("x", 82)             
+        .attr("y", (text_height/2) + 5)
+        //.attr("text-anchor", "middle")  
         .style("font-size", "16px")
-        .text("Sharpe Ratio: " + SharpeRatio);
+        .text("Sharpe Ratio: " + d3.format(".2f")(SharpeRatio));
 
     total_taxes_graph.append("text")
-        .attr("x", 0)             
-        .attr("y", 0)
-        .attr("text-anchor", "middle")  
+        .attr("x", 85)             
+        .attr("y", (text_height/2) + 5)
+        //.attr("text-anchor", "middle")  
         .style("font-size", "16px")
-        .text("Total taxes: " + totalTax);
+        .text("Total taxes: " + d3.format("$,.2f")(totalTax));
 }
 
 function colorOfBar(percent)

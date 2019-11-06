@@ -66,7 +66,16 @@
 }
 
 .text {
+  position: relative;
+  left: 8px;
+  top: 8px;
+  text-align: center;
   
+  border: 4px solid dimgray;
+}
+
+.empty {
+  height: 120px;
 }
 
 .button {
@@ -79,12 +88,17 @@
   border-radius: 10px;
 }
 
+.bigmenu {
+  display: flex;
+}
+
 .menu {
   position relative;
+  flex-grow: 1;
   display: flex;
   
   width: 50%;
-  left: 40px;
+  height: 125px;
 }
 
 .item {
@@ -95,10 +109,24 @@
   margin-bottom: auto;
 }
 
+.item2 {
+  position: relative;
+  flex-grow: 1;
+  
+  right: 50px;
+  width: 300px;
+  height: 60px;
+  
+  margin-top: auto;
+  margin-bottom: auto;
+  
+  bottom: 30px;
+}
+
 .pan {
   position: absolute;
   left: 1100px;
-  bottom: 790px;
+  bottom: 750px;
   width: 145px;
 }
 
