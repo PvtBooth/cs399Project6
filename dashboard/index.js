@@ -114,6 +114,7 @@ var maxSharesShown = 50;
 var shareRatioMax = 0.50;
 var current_date; //String 
 var purchases = []; // Array of current purchases
+var g_sums = [];
 
 //Need to calculate
 var AccountPercentageGain = 0.0;
@@ -287,6 +288,7 @@ var ResetVolatileData = function()
   currentMoney = startingMoney;
   stockValue = 0;
   purchases = [];
+  g_sums = [];
 
   AccountPercentageGain = 0.0;
   AverageDailyPercentageGain = 0.0;
@@ -1239,7 +1241,7 @@ function LinearlyWeightedMovingAverage(date, trendRange, threshold)
 }
 
 
-var g_sums = [];
+
     // uses mean reversion theory, buys under mean, sells above, to a threshold.
 function MeanMethod(date, threshold) {
   var dateIndex = dates.indexOf(date);
