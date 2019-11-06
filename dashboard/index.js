@@ -3,7 +3,7 @@ jQuery("#loading").toggle();
 
 //Fancy Calendar
 const start_date_calendar = flatpickr('#start-date', {
-    "defaultDate": "2019-01-02",
+    "defaultDate": "2009-01-02",
     "dateFormat": "Y-m-d",
     "minDate": "2009-01-02",
     "maxDate": "2019-10-11",
@@ -1059,13 +1059,12 @@ function main(data)
         map[entry.Date] = entry;
         return map;
     }, {});
-   
+
     var dateRange = dates.slice(dates.indexOf(startDate), dates.indexOf(endDate));
     DailyAccountValue.push({ date: new Date(dates[0]), money: currentMoney + stockValue });
     dateRange.forEach(function(date)
     {
-        console.log(date);
-
+        // console.log(date);
         if(strategy == "s0")
         {
           LinearlyWeightedMovingAverage(date, 20, 0.0001);
@@ -1168,243 +1167,265 @@ function main(data)
 // }
 
 
-function LinearlyWeightedMovingAverage(date, trendRange, threshold) {
+function LinearlyWeightedMovingAverage(date, trendRange, threshold) 
+{
+  var dateIndex = dates.indexOf(date);
+  var current_date = new Date(date);
+  var deltas = []
   stocks.forEach(function(stock) {
-      var val = GetPrice(date, stock);
-      var dateIndex = dates.indexOf(date);
-      var currentDen = 0; var prevDen = 0;
-      var currentP = 0;  var prevP = 0;
-      // Get today's average
-      for(var i = 0; i < trendRange; i++)
-      {
-          var weight = trendRange - i;
-          if(dateIndex - i < 0)
-              continue;
-          var newCurrentP = GetPrice(dates[dateIndex-i], stock);
-          if(newCurrentP > 0)
-          {
-            currentP += newCurrentP*weight; 
-            currentDen += weight;
-          }
-          if(dateIndex - i - 1 < 0)
-              continue;
-          var newPrevP = GetPrice(dates[dateIndex-i - 1], stock);
-          if(newPrevP > 0)
-          {
-            prevP += newPrevP*weight; 
-            prevDen += weight;
-          }
-      }
-      var currentP = currentP/currentDen;
-      var prevP = prevP/prevDen; 
-      var delta = (currentP - prevP)/currentP;
-      // console.log(delta);
-      // console.log("delta: " + delta);
-      if(delta > threshold && currentMoney > val && val > 0)
-      {
-          purchases.push({ date: date, stock: stock, amount: 1});
-          currentMoney -= val;
-          //Add back to shares
-          AddToSharesOfStockArray({ date: date, stock: stock, amount: 1});
-          // console.log("Buying a share of " + stock + " on " + date + " for " + val);
-      }
-      if(delta < -1*threshold/4 )  {
-          var i = purchases.length;
-          while(i--) {
-              var purchase = purchases[i];
-              if(purchase.stock != stock || !HasPrice(date, stock))
-                continue;
-              var purchase_date = new Date(purchase.date);
-              var current_date = new Date(date);
-              var diff = (current_date - purchase_date) / 86400000; // convert ms (dates) to days
-              if (diff < 90)
-                continue;
-              var value = GetPrice(date, purchase.stock);
-              currentMoney += value;
-              purchases.splice(i, 1);
-              // console.log("Selling a share of " + purchase.stock + " on " + date + " for " + value);
-          }
-      }
+    deltas.push({delta: 0.0, stock: stock})
+  })
+
+  stocks.forEach(function(stock) {
+    if(!HasPrice(date, stock))
+      return;
+    var val = GetPrice(date, stock);
+    var dateIndex = dates.indexOf(date);
+    var currentDen = 0; var prevDen = 0;
+    var currentP = 0;  var prevP = 0;
+    // Get today's average
+    for(var i = 0; i < trendRange; i++)
+    {
+        var weight = trendRange - i;
+        if(dateIndex - i < 0)
+            continue;
+        var newCurrentP = GetPrice(dates[dateIndex-i], stock);
+        if(newCurrentP > 0)
+        {
+          currentP += newCurrentP*weight; 
+          currentDen += weight;
+        }
+        if(dateIndex - i - 1 < 0)
+            continue;
+        var newPrevP = GetPrice(dates[dateIndex-i - 1], stock);
+        if(newPrevP > 0)
+        {
+          prevP += newPrevP*weight; 
+          prevDen += weight;
+        }
+    }
+    var currentP = currentP/currentDen;
+    var prevP = prevP/prevDen; 
+    var delta = (currentP - prevP)/currentP;
+    // console.log(delta);
+    // console.log("delta: " + delta);
+    if(delta > threshold && currentMoney > val)
+    {
+        purchases.push({ date: date, stock: stock, amount: 1});
+        currentMoney -= val;
+        //Add back to shares
+        AddToSharesOfStockArray({ date: date, stock: stock, amount: 1});
+        // console.log("Buying a share of " + stock + " on " + date + " for " + val);
+    }
+    deltas[stocks.indexOf(stock)] = delta;
+  })
+  
+  var i = purchases.length;
+  while(i--)
+  {
+    var purchase = purchases[i];
+    if(!HasPrice(date, purchase.stock))
+      continue;
+    var purchase_date = new Date(purchase.date);
+    var diff = (current_date - purchase_date) / 86400000; // convert ms (dates) to days
+    if (diff < 90)
+      continue;
+    if(deltas[stocks.indexOf(purchase.stock)] > -1*threshold/4)
+      continue;
+    currentMoney += GetPrice(date, purchase.stock);
+    purchases.splice(i, 1);
+      // console.log("Selling a share of " + purchase.stock + " on " + date + " for " + value);
   }
-)}
+}
 
 
 var g_sums = [];
     // uses mean reversion theory, buys under mean, sells above, to a threshold.
 function MeanMethod(date, threshold) {
+  var dateIndex = dates.indexOf(date);
+  //init pass
+  if(g_sums.length == 0)
+  {
+      stocks.forEach(function(stock) {
+          g_sums.push({sum: 0, stock: stock})
+      })
+  }
 
-    //init pass
-    if(g_sums.length == 0)
-    {
-        stocks.forEach(function(stock) {
-            g_sums.push({sum: 0, stock: stock})
-        })
-    }
+  //update
+  stocks.forEach(function(stock)
+  {
+    if(!HasPrice(date, stock))
+      return;
 
-    //update
-    stocks.forEach(function(stock)
-    {
-        var currPrice = GetPrice(date, stock);
-        var dateIndex = dates.indexOf(date);
-        var stockListIndex = stocks.indexOf(stock); //also index into g_sums
+      var currPrice = GetPrice(date, stock);
+      var stockListIndex = stocks.indexOf(stock); //also index into g_sums
 
-        //update the sum
-        var newSum = g_sums[stockListIndex].sum + currPrice;
-        g_sums[stockListIndex].sum = newSum;
+      //update the sum
+      var newSum = g_sums[stockListIndex].sum + currPrice;
+      g_sums[stockListIndex].sum = newSum;
 
-        //find mean
-        var currMean = newSum / (dateIndex + 1);
+      //find mean
+      var currMean = newSum / (dateIndex + 1);
 
-        //compare
-        var delta = (currPrice - currMean) / currPrice;
-        //console.log("delta: " + delta);
-        if(delta > 0 &&  delta > threshold)
-        {
-            //sell
-            var i = purchases.length;
-            while(i--) {
-                var purchase = purchases[i];
-                if(purchase.stock != stock)
-                    continue;
+      //compare
+      var delta = (currPrice - currMean) / currPrice;
+      //console.log("delta: " + delta);
 
-                var purchase_date = new Date(purchase.date);
-                var current_date = new Date(date);
-                var diff = (current_date - purchase_date) / 86400000; // convert ms (dates) to days
-                if (diff < 90)
-                    continue;
+      if(delta < 0 && delta < -threshold && currentMoney > currPrice)
+      {
+          //buy
+          purchases.push({ date: date, stock: stock, amount: 1});
 
-                var value = GetPrice(date, purchase.stock);
-                currentMoney += value;
-                //console.log("Selling a share of " + purchase.stock + " on " + date + " for " + value);
-                purchases.splice(i, 1);
-            }
-        }
-        if(delta < 0 && delta < -threshold && currentMoney > currPrice && currPrice != 0)
-        {
-            //buy
-            purchases.push({ date: date, stock: stock, amount: 1});
+          //update stocksCount data for viz
+          AddToSharesOfStockArray({ date: date, stock: stock, amount: 1});
 
-            //update stocksCount data for viz
-            AddToSharesOfStockArray({ date: date, stock: stock, amount: 1});
+          currentMoney -= currPrice;
+          //console.log("Buying a share of " + stock + " on " + date + " for " + currPrice);
+      }
+  })
 
-            currentMoney -= currPrice;
-            //console.log("Buying a share of " + stock + " on " + date + " for " + currPrice);
-        }
+  //sell
+  var i = purchases.length;
+  var current_date = new Date(date);
+  while(i--) {
+      var purchase = purchases[i];
+      if(!HasPrice(date,purchase.stock))
+        continue;
+      var purchase_date = new Date(purchase.date);
+      var diff = (current_date - purchase_date) / 86400000; // convert ms (dates) to days
+      if (diff < 90)
+          continue;
+      var currPrice = GetPrice(date, purchase.stock);
+      var stockListIndex = stocks.indexOf(purchase.stock); //also index into g_sums
+      var newSum = g_sums[stockListIndex].sum;
 
-    })
+      //find mean
+      var currMean = newSum / (dateIndex + 1);
+
+      //compare
+      var delta = (currPrice - currMean) / currPrice;
+      if(delta > 0 && delta > threshold)
+      {
+        currentMoney += currPrice;
+        //console.log("Selling a share of " + purchase.stock + " on " + date + " for " + value);
+        purchases.splice(i, 1);
+      }
+  }
 }
 
 // Random strategy. Probability to buy each available stock each day. Sell after 60 days of ownership.
 function RandomStrategy(date, probability) {
-    stocks.forEach(function(stock) {
-        if(!HasPrice(date, stock))
-            return;
-        var value = GetPrice(date, stock);
-        var roll = Math.random();
-        if (roll < probability) {
+  stocks.forEach(function(stock) {
+      if(!HasPrice(date, stock))
+          return;
+      var value = GetPrice(date, stock);
+      var roll = Math.random();
+      if (roll < probability) {
 
-            //if we got da money
-            if (currentMoney > value) {
-                //buy dat and log it
-                purchases.push({ date: date, stock: stock, amount: 1});
+          //if we got da money
+          if (currentMoney > value) {
+              //buy dat and log it
+              purchases.push({ date: date, stock: stock, amount: 1});
 
-                //Call Shares function
-                AddToSharesOfStockArray({stock: stock, amount: 1});
+              //Call Shares function
+              AddToSharesOfStockArray({stock: stock, amount: 1});
 
-                currentMoney -= value;
-                //console.log("Buying a share of " + stock + " on " + date + " for " + value);
-            }
-        }
-    });
+              currentMoney -= value;
+              //console.log("Buying a share of " + stock + " on " + date + " for " + value);
+          }
+      }
+  });
 
-    var i = purchases.length;
-    while(i--) {
-        var purchase = purchases[i];
-        var purchase_date = new Date(purchase.date);
-        var current_date = new Date(date);
-
-        var diff = (current_date - purchase_date) / 86400000; // convert ms (dates) to days
-        if (diff > 60) {
-            if(!HasPrice(date, purchase.stock))
-                continue;
-            var value = GetPrice(date, purchase.stock)
-            currentMoney += value;
-            //console.log("Selling a share of " + purchase.stock + " on " + current_date + " for " + value);
-            purchases.splice(i, 1);
-        }
-    }
+  var i = purchases.length;
+  while(i--) {
+    var purchase = purchases[i];
+    if(!HasPrice(date, purchase.stock))
+      continue;
+    var purchase_date = new Date(purchase.date);
+    var current_date = new Date(date);
+    var diff = (current_date - purchase_date) / 86400000; // convert ms (dates) to days
+    if (diff < 60)
+      continue;
+    var value = GetPrice(date, purchase.stock)
+    currentMoney += value;
+    //console.log("Selling a share of " + purchase.stock + " on " + current_date + " for " + value);
+    purchases.splice(i, 1);
+  }
 }
 
 function SimpleMovingAverageMethod(date, MinTrend, MaxTrend, Amount) {
-    stocks.forEach(function(stock) {
-            var val = GetPrice(date, stock);
-            var dateIndex = dates.indexOf(date);
-            var currentDen = 0; var prevDen = 0;
-            var currentP = 0;  var prevP = 0;
+  var dateIndex = dates.indexOf(date);
+  var deltas = []
+  stocks.forEach(function(stock) {
+    deltas.push({delta: 0.0, stock: stock})
+  })
 
+  var stockInd = 0;
+  stocks.forEach(function(stock) {
+    var val = GetPrice(date, stock);
+    var currentDen = 0; var prevDen = 0;
+    var currentP = 0;  var prevP = 0;
+    // skip first 200 days
+    if(dateIndex < MaxTrend)
+    {
+        return;
+    }
 
+    for(var i = 0; i < MaxTrend; i++)
+    {
+        var newCurrentP = GetPrice(dates[dateIndex-i], stock);
 
-            // skip first 200 days
-            if(dateIndex < MaxTrend)
+        //if not empty
+        if(newCurrentP > 0)
+        {
+            currentDen++;
+            currentP += newCurrentP;
+        }
+
+        if(i < MinTrend)
+        {
+            var newPrevP = GetPrice(dates[dateIndex-i], stock);
+
+            //if not empty
+            if(newPrevP > 0)
             {
-                return;
-            }
-
-            for(var i = 0; i < MaxTrend; i++)
-            {
-                var newCurrentP = GetPrice(dates[dateIndex-i], stock);
-
-                //if not empty
-                if(newCurrentP > 0)
-                {
-                    currentDen++;
-                    currentP += newCurrentP;
-                }
-
-                if(i < MinTrend)
-                {
-                    var newPrevP = GetPrice(dates[dateIndex-i], stock);
-
-                    //if not empty
-                    if(newPrevP > 0)
-                    {
-                        prevDen++;
-                        prevP += newPrevP;
-                    }
-                }
-            }
-            var currentP = currentP/currentDen;
-            var prevP = prevP/prevDen;
-            // console.log("currentP = " + currentP);
-            // console.log("prevP = " + prevP);
-            if(currentP < prevP && currentMoney > (val * Amount))
-            {
-                purchases.push({ date: date, stock: stock, amount: Amount});
-                currentMoney -= val * Amount;
-                //Add back to shares
-                AddToSharesOfStockArray({ date: date, stock: stock, amount: Amount});
-                // console.log("Buying a share of " + stock + " on " + date + " for " + val);
-            }
-            else
-            {
-                var i = purchases.length;
-                while(i--) {
-                    var purchase = purchases[i];
-                    if(purchase.stock != stock || !HasPrice(date, stock))
-                        continue;
-                    var purchase_date = new Date(purchase.date);
-                    var current_date = new Date(date);
-                    var diff = (current_date - purchase_date) / 86400000; // convert ms (dates) to days
-                    if (diff < 90)
-                        continue;
-                    var value = GetPrice(date, purchase.stock);
-                    currentMoney += value;
-                    purchases.splice(i, 1);
-                    // console.log("Selling a share of " + purchase.stock + " on " + date + " for " + value);
-                }
+                prevDen++;
+                prevP += newPrevP;
             }
         }
-    )}
+    }
+    var currentP = currentP/currentDen;
+    var prevP = prevP/prevDen;
+    // console.log("currentP = " + currentP);
+    // console.log("prevP = " + prevP);
+    if(currentP < prevP && currentMoney > (val * Amount))
+    {
+        purchases.push({ date: date, stock: stock, amount: Amount});
+        currentMoney -= val * Amount;
+        //Add back to shares
+        AddToSharesOfStockArray({ date: date, stock: stock, amount: Amount});
+        // console.log("Buying a share of " + stock + " on " + date + " for " + val);
+    }
+    deltas[stocks.indexOf(stock)] = currentP / prevP;
+  })
+
+  var current_date = new Date(date);
+  var ind = purchases.length;
+  while(ind--) {
+    var purchase = purchases[ind];
+    if(!HasPrice(date, purchase.stock))
+        continue;
+    var purchase_date = new Date(purchase.date);
+    var diff = (current_date - purchase_date) / 86400000; // convert ms (dates) to days
+    if (diff < 90)
+        continue;
+    if(deltas[stocks.indexOf(purchase.stock)] > 1.0)
+      continue;
+    var value = GetPrice(date, purchase.stock);
+    currentMoney += value;
+    purchases.splice(ind, 1);
+  }
+}
 
 // Get value of all owned stocks on a certain date
 function GetTotalStockValue(date){
