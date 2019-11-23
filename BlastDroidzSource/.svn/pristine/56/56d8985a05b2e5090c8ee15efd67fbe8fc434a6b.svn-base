@@ -1,0 +1,10 @@
+__color__,__group__,__style__,ticket,summary,component,status,resolution,version,type,priority,owner,modified,_time,_reporter
+1,,font-weight: bold,9,I DON'T HAVE A CHAIR,Tools,closed,fixed,1,defect,blocker,c.astaire,2017-02-02T14:10:29-0800,14:10:29-0800,evan.kau
+2,,color: #777; background: #ddd; border-color: #ccc;,7,please say over,Networking,closed,wontfix,1,enhancement,critical,henry.brobeck,2017-02-02T14:05:10-0800,13:56:10-0800,c.astaire
+4,,color: #777; background: #ddd; border-color: #ccc;,5,Magic Number,GameLogic,closed,fixed,1,defect,minor,c.astaire,2017-02-02T14:03:43-0800,13:54:13-0800,c.astaire
+3,,color: #777; background: #ddd; border-color: #ccc;,8,TABS,AI,closed,wontfix,1,defect,major,henry.brobeck,2017-02-02T14:03:00-0800,14:02:28-0800,c.astaire
+3,,color: #777; background: #ddd; border-color: #ccc;,6,array length support,AI,closed,fixed,1,defect,major,c.astaire,2017-02-02T13:58:10-0800,13:55:33-0800,c.astaire
+2,,color: #777; background: #ddd; border-color: #ccc;,4,Window Title in spanish,Scripting,closed,fixed,1,defect,critical,c.astaire,2017-02-02T13:53:03-0800,13:50:51-0800,c.astaire
+1,,color: #777; background: #ddd; border-color: #ccc;,3,"Error Thrown at first ""Enter"" input",AI,closed,fixed,1,defect,blocker,c.astaire,2017-02-02T13:48:42-0800,13:46:14-0800,c.astaire
+1,,color: #777; background: #ddd; border-color: #ccc;,1,exception thrown shortly after build,Tools,closed,fixed,1,defect,blocker,c.astaire,2017-02-02T13:46:47-0800,13:38:00-0800,c.astaire
+1,,color: #777; background: #ddd; border-color: #ccc;,2,exception thrown shortly after build,Tools,closed,duplicate,1,defect,blocker,henry.brobeck,2017-02-02T13:40:49-0800,13:38:01-0800,c.astaire

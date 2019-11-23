@@ -1,0 +1,148 @@
+﻿<wpf:ResourceDictionary xml:space="preserve" xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml" xmlns:s="clr-namespace:System;assembly=mscorlib" xmlns:ss="urn:shemas-jetbrains-com:settings-storage-xaml" xmlns:wpf="http://schemas.microsoft.com/winfx/2006/xaml/presentation">
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/QuickList/=DC382AF7D0007545BD63EC8B3729639C/Entry/=43AD97CCDB79B540B2A028AD7806D1A5/@KeyIndexDefined">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/QuickList/=DC382AF7D0007545BD63EC8B3729639C/Entry/=43AD97CCDB79B540B2A028AD7806D1A5/EntryName/@EntryValue">New C File</s:String>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/QuickList/=DC382AF7D0007545BD63EC8B3729639C/Entry/=43AD97CCDB79B540B2A028AD7806D1A5/Position/@EntryValue">3</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=29D7927E077A6241BEA052CF23018DA6/@KeyIndexDefined">True</s:Boolean>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=29D7927E077A6241BEA052CF23018DA6/Applicability/=Live/@EntryIndexedValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=29D7927E077A6241BEA052CF23018DA6/Reformat/@EntryValue">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=29D7927E077A6241BEA052CF23018DA6/Shortcut/@EntryValue">FUNCH</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=29D7927E077A6241BEA052CF23018DA6/ShortenQualifiedReferences/@EntryValue">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=29D7927E077A6241BEA052CF23018DA6/Text/@EntryValue">//Function&#xD;
+//Description: Description here.&#xD;
+//Inputs: Inputs here.&#xD;
+//Output: Output here.</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=29D7927E077A6241BEA052CF23018DA6/Scope/=139FF4CE89E7094686FDA7BF5FFBBE92/@KeyIndexDefined">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=29D7927E077A6241BEA052CF23018DA6/Scope/=139FF4CE89E7094686FDA7BF5FFBBE92/Type/@EntryValue">Everywhere</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=43AD97CCDB79B540B2A028AD7806D1A5/@KeyIndexDefined">True</s:Boolean>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=43AD97CCDB79B540B2A028AD7806D1A5/Applicability/=File/@EntryIndexedValue">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=43AD97CCDB79B540B2A028AD7806D1A5/CustomProperties/=Extension/@EntryIndexedValue">c</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=43AD97CCDB79B540B2A028AD7806D1A5/CustomProperties/=FileName/@EntryIndexedValue">NewTeamA001CFile</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=43AD97CCDB79B540B2A028AD7806D1A5/CustomProperties/=ValidateFileName/@EntryIndexedValue">True</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=43AD97CCDB79B540B2A028AD7806D1A5/Description/@EntryValue">New TeamA001 C File</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=43AD97CCDB79B540B2A028AD7806D1A5/Reformat/@EntryValue">True</s:Boolean>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=43AD97CCDB79B540B2A028AD7806D1A5/ShortenQualifiedReferences/@EntryValue">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=43AD97CCDB79B540B2A028AD7806D1A5/Text/@EntryValue">/******************************************************************************/&#xD;
+/*!&#xD;
+	\file   $NAME$.c&#xD;
+	\author Evan Kau&#xD;
+	\date   $DATE$&#xD;
+	\par    Course: GAM150&#xD;
+	\par    Copyright © 2017 DigiPen (USA) Corporation.&#xD;
+	\brief&#xD;
+ */&#xD;
+/******************************************************************************/&#xD;
+&#xD;
+#include "$NAME$.h"&#xD;
+&#xD;
+/*------------------------------------------------------------------------------&#xD;
+// Private Consts:&#xD;
+//----------------------------------------------------------------------------*/&#xD;
+&#xD;
+/*------------------------------------------------------------------------------&#xD;
+// Private Structures:&#xD;
+//----------------------------------------------------------------------------*/&#xD;
+&#xD;
+/*------------------------------------------------------------------------------&#xD;
+// Public Variables:&#xD;
+//----------------------------------------------------------------------------*/&#xD;
+&#xD;
+/*------------------------------------------------------------------------------&#xD;
+// Private Variables:&#xD;
+//----------------------------------------------------------------------------*/&#xD;
+&#xD;
+/*------------------------------------------------------------------------------&#xD;
+// Private Function Declarations:&#xD;
+//----------------------------------------------------------------------------*/&#xD;
+&#xD;
+/*------------------------------------------------------------------------------&#xD;
+// Public Functions:&#xD;
+//----------------------------------------------------------------------------*/&#xD;
+&#xD;
+/*!&#xD;
+ \brief&#xD;
+ */&#xD;
+void $NAME$_Init(void)&#xD;
+{&#xD;
+&#xD;
+}&#xD;
+&#xD;
+/*!&#xD;
+ \brief&#xD;
+ \param	dt Change in time (in seconds) since last game loop.&#xD;
+ */&#xD;
+void $NAME$_Update(float dt)&#xD;
+{&#xD;
+	&#xD;
+}&#xD;
+&#xD;
+/*!&#xD;
+ \brief&#xD;
+ */&#xD;
+void $NAME$_Exit(void)&#xD;
+{&#xD;
+&#xD;
+}&#xD;
+&#xD;
+/*------------------------------------------------------------------------------&#xD;
+// Private Functions:&#xD;
+//----------------------------------------------------------------------------*/&#xD;
+</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=43AD97CCDB79B540B2A028AD7806D1A5/Field/=DATE/@KeyIndexDefined">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=43AD97CCDB79B540B2A028AD7806D1A5/Field/=DATE/Expression/@EntryValue">getCurrentDate("d")</s:String>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=43AD97CCDB79B540B2A028AD7806D1A5/Field/=DATE/Order/@EntryValue">1</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=43AD97CCDB79B540B2A028AD7806D1A5/Field/=NAME/@KeyIndexDefined">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=43AD97CCDB79B540B2A028AD7806D1A5/Field/=NAME/Expression/@EntryValue">getFileNameWithoutExtension()</s:String>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=43AD97CCDB79B540B2A028AD7806D1A5/Field/=NAME/Order/@EntryValue">0</s:Int64>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=43AD97CCDB79B540B2A028AD7806D1A5/Scope/=CD5B1AEA8099834C8F10F84286AA88CA/@KeyIndexDefined">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=43AD97CCDB79B540B2A028AD7806D1A5/Scope/=CD5B1AEA8099834C8F10F84286AA88CA/Type/@EntryValue">InCppProjectFile</s:String>
+	<s:Boolean x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=43AD97CCDB79B540B2A028AD7806D1A5/Section/=404107A7AC6C5C459D7E41A4E76D650A/@KeyIndexDefined">True</s:Boolean>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=43AD97CCDB79B540B2A028AD7806D1A5/Section/=404107A7AC6C5C459D7E41A4E76D650A/LocationSelectorConfig/@EntryValue">&lt;RelativeConfig File="$NAME$.h" /&gt;</s:String>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=43AD97CCDB79B540B2A028AD7806D1A5/Section/=404107A7AC6C5C459D7E41A4E76D650A/LocationSelectorName/@EntryValue">manual</s:String>
+	<s:Int64 x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=43AD97CCDB79B540B2A028AD7806D1A5/Section/=404107A7AC6C5C459D7E41A4E76D650A/Order/@EntryValue">0</s:Int64>
+	<s:String x:Key="/Default/PatternsAndTemplates/LiveTemplates/Template/=43AD97CCDB79B540B2A028AD7806D1A5/Section/=404107A7AC6C5C459D7E41A4E76D650A/SectionPlain/Text/@EntryValue">/******************************************************************************/&#xD;
+/*!&#xD;
+	\file   $NAME$.h&#xD;
+	\author Evan Kau&#xD;
+	\date   $DATE$&#xD;
+	\par    Course: GAM150&#xD;
+	\par    Copyright © 2017 DigiPen (USA) Corporation.&#xD;
+	\brief&#xD;
+ */&#xD;
+/******************************************************************************/&#xD;
+&#xD;
+#pragma once&#xD;
+&#xD;
+#ifdef __cplusplus&#xD;
+extern "C" {&#xD;
+	/* Assume C declarations for C++ */&#xD;
+#endif&#xD;
+&#xD;
+/*------------------------------------------------------------------------------&#xD;
+// Public Consts:&#xD;
+//----------------------------------------------------------------------------*/&#xD;
+&#xD;
+/*------------------------------------------------------------------------------&#xD;
+// Public Structures:&#xD;
+//----------------------------------------------------------------------------*/&#xD;
+&#xD;
+/*------------------------------------------------------------------------------&#xD;
+// Public Variables:&#xD;
+//----------------------------------------------------------------------------*/&#xD;
+&#xD;
+/*------------------------------------------------------------------------------&#xD;
+// Public Functions:&#xD;
+//----------------------------------------------------------------------------*/&#xD;
+&#xD;
+void $NAME$_Init(void);&#xD;
+&#xD;
+void $NAME$_Update(float dt);&#xD;
+&#xD;
+void $NAME$_Exit(void);&#xD;
+&#xD;
+/*----------------------------------------------------------------------------*/&#xD;
+&#xD;
+#ifdef __cplusplus&#xD;
+}                       /* End of extern "C" { */&#xD;
+#endif&#xD;
+&#xD;
+</s:String></wpf:ResourceDictionary>

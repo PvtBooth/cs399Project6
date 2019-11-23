@@ -1,0 +1,432 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <ProjectGuid>{99C44468-B6FA-417A-818E-F61E863B4D40}</ProjectGuid>
+    <RootNamespace>CS230SimpleDemo</RootNamespace>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectName>GAM150_Project</ProjectName>
+    <WindowsTargetPlatformVersion>10.0.15063.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>NotSet</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>NotSet</CharacterSet>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>NotSet</CharacterSet>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <CharacterSet>NotSet</CharacterSet>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="PropertySheets">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup>
+    <_ProjectFileVersion>10.0.40219.1</_ProjectFileVersion>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">$(Configuration)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</LinkIncremental>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</LinkIncremental>
+    <OutDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(SolutionDir)$(Platform)\$(Configuration)\</OutDir>
+    <IntDir Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">$(Configuration)\</IntDir>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</LinkIncremental>
+    <LinkIncremental Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <IncludePath>.\fmod\inc;$(IncludePath)</IncludePath>
+    <LibraryPath>.\fmod\lib;$(LibraryPath)</LibraryPath>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <IncludePath>.\fmod\inc;$(IncludePath)</IncludePath>
+    <LibraryPath>.\fmod\lib;$(LibraryPath)</LibraryPath>
+    <EmbedManifest>false</EmbedManifest>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>..\Alpha_Engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <MinimalRebuild>false</MinimalRebuild>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeader>NotUsing</PrecompiledHeader>
+      <WarningLevel>Level4</WarningLevel>
+      <DebugInformationFormat>EditAndContinue</DebugInformationFormat>
+      <CompileAs>CompileAsC</CompileAs>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <DisableSpecificWarnings>4201;%(DisableSpecificWarnings)</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <OutputFile>$(OutDir)$(ProjectName).exe</OutputFile>
+      <AdditionalLibraryDirectories>$(SolutionDir)$(Platform)\$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <TargetMachine>MachineX86</TargetMachine>
+      <AdditionalDependencies>fmod_vc.lib;Xinput9_1_0.lib;%(AdditionalDependencies)</AdditionalDependencies>
+      <ImageHasSafeExceptionHandlers>false</ImageHasSafeExceptionHandlers>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <Optimization>Disabled</Optimization>
+      <AdditionalIncludeDirectories>..\Alpha_Engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <BasicRuntimeChecks>EnableFastChecks</BasicRuntimeChecks>
+      <RuntimeLibrary>MultiThreadedDebugDLL</RuntimeLibrary>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <CompileAs>CompileAsC</CompileAs>
+    </ClCompile>
+    <Link>
+      <OutputFile>$(OutDir)$(ProjectName).exe</OutputFile>
+      <AdditionalLibraryDirectories>$(SolutionDir)$(Platform)\$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <AdditionalDependencies>Alpha_Engine_D.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>..\Alpha_Engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level4</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <CompileAs>CompileAsC</CompileAs>
+      <TreatWarningAsError>true</TreatWarningAsError>
+      <DisableSpecificWarnings>4201</DisableSpecificWarnings>
+    </ClCompile>
+    <Link>
+      <OutputFile>$(OutDir)$(ProjectName).exe</OutputFile>
+      <AdditionalLibraryDirectories>$(SolutionDir)$(Platform)\$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <TargetMachine>MachineX86</TargetMachine>
+      <AdditionalDependencies>fmod_vc.lib;Xinput9_1_0.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <Optimization>MaxSpeed</Optimization>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <AdditionalIncludeDirectories>..\Alpha_Engine;%(AdditionalIncludeDirectories)</AdditionalIncludeDirectories>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_WINDOWS;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <RuntimeLibrary>MultiThreadedDLL</RuntimeLibrary>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <PrecompiledHeader>
+      </PrecompiledHeader>
+      <WarningLevel>Level3</WarningLevel>
+      <DebugInformationFormat>ProgramDatabase</DebugInformationFormat>
+      <CompileAs>CompileAsC</CompileAs>
+    </ClCompile>
+    <Link>
+      <OutputFile>$(OutDir)$(ProjectName).exe</OutputFile>
+      <AdditionalLibraryDirectories>$(SolutionDir)$(Platform)\$(Configuration)\;%(AdditionalLibraryDirectories)</AdditionalLibraryDirectories>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+      <SubSystem>Windows</SubSystem>
+      <OptimizeReferences>true</OptimizeReferences>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <AdditionalDependencies>Alpha_Engine.lib;kernel32.lib;user32.lib;gdi32.lib;winspool.lib;comdlg32.lib;advapi32.lib;shell32.lib;ole32.lib;oleaut32.lib;uuid.lib;odbc32.lib;odbccp32.lib;%(AdditionalDependencies)</AdditionalDependencies>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="AbilityComponent.c" />
+    <ClCompile Include="AIForwardShoot.c" />
+    <ClCompile Include="AIGraph.c" />
+    <ClCompile Include="AIManager.c" />
+    <ClCompile Include="AIMarkerComponent.c" />
+    <ClCompile Include="AISwarm.c" />
+    <ClCompile Include="AISwarmAgent.c" />
+    <ClCompile Include="AITurretComponent.c" />
+    <ClCompile Include="AssetTable.c" />
+    <ClCompile Include="AutoLaserComponent.c" />
+    <ClCompile Include="BarComponent.c" />
+    <ClCompile Include="BarTestState.c" />
+    <ClCompile Include="BlackHoleComponent.c" />
+    <ClCompile Include="BombAbilityComponent.c" />
+    <ClCompile Include="BombProjectileComponent.c" />
+    <ClCompile Include="ButtonComponent.c" />
+    <ClCompile Include="Camera.c" />
+    <ClCompile Include="ColeTestState.c" />
+    <ClCompile Include="ColliderComponent.c" />
+    <ClCompile Include="CollisionDamageComponent.c" />
+    <ClCompile Include="CollisionDestroyComponent.c" />
+    <ClCompile Include="CollisionSubject.c" />
+    <ClCompile Include="Colors.c" />
+    <ClCompile Include="Component.c" />
+    <ClCompile Include="CurtainMissileComponent.c" />
+    <ClCompile Include="DashAbilityComponent.c" />
+    <ClCompile Include="DelayedMissileComponent.c" />
+    <ClCompile Include="DigiPenLogoStackState.c" />
+    <ClCompile Include="DigiPenLogoState.c" />
+    <ClCompile Include="EnemyTest.c" />
+    <ClCompile Include="EnemyTestComponent.c" />
+    <ClCompile Include="Enemy_BerserkerComponent.c" />
+    <ClCompile Include="Enemy_CapitalShipComponent.c" />
+    <ClCompile Include="Enemy_SimpleComponent.c" />
+    <ClCompile Include="Enemy_StationComponent.c" />
+    <ClCompile Include="Enemy_SuicideComponent.c" />
+    <ClCompile Include="Engine.c" />
+    <ClCompile Include="EngineProofState.c" />
+    <ClCompile Include="Entity.c" />
+    <ClCompile Include="EntityManager.c" />
+    <ClCompile Include="EntitySubject.c" />
+    <ClCompile Include="FailStackState.c" />
+    <ClCompile Include="Game.c" />
+    <ClCompile Include="GameplayState.c" />
+    <ClCompile Include="GameState.c" />
+    <ClCompile Include="GameStateStack.c" />
+    <ClCompile Include="GenericTorpedoComponent.c" />
+    <ClCompile Include="Graphics.c" />
+    <ClCompile Include="GraphicsManager.c" />
+    <ClCompile Include="GravMissileAbilityComponent.c" />
+    <ClCompile Include="GravTorpedoComponent.c" />
+    <ClCompile Include="HealthComponent.c" />
+    <ClCompile Include="HealthSubject.c" />
+    <ClCompile Include="AbilitySubject.c" />
+    <ClCompile Include="HUDScore.c" />
+    <ClCompile Include="InputEvent.c" />
+    <ClCompile Include="InputGatherComponent.c" />
+    <ClCompile Include="InputTest.c" />
+    <ClCompile Include="IntroStackState.c" />
+    <ClCompile Include="IntroState.c" />
+    <ClCompile Include="JumpgateComponent.c" />
+    <ClCompile Include="KillAssignment.c" />
+    <ClCompile Include="LaserComponent.c" />
+    <ClCompile Include="LevelGenNormal.c" />
+    <ClCompile Include="LevelMarker.c" />
+    <ClCompile Include="LevelState.c" />
+    <ClCompile Include="LifetimeComponent.c" />
+    <ClCompile Include="Log.c" />
+    <ClCompile Include="Main.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">false</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">false</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="MainMenuStackState.c" />
+    <ClCompile Include="MainMenuState.c" />
+    <ClCompile Include="Matrix3x3.c" />
+    <ClCompile Include="MeshGroup.c" />
+    <ClCompile Include="MissileBarrageComponent.c" />
+    <ClCompile Include="MissileComponent.c" />
+    <ClCompile Include="OptionsStackState.c" />
+    <ClCompile Include="ParticleSystem.c" />
+    <ClCompile Include="PausedStackState.c" />
+    <ClCompile Include="PlayerHealthComponent.c" />
+    <ClCompile Include="PlayerHUD.c" />
+    <ClCompile Include="PlayerHUDControllerComponent.c" />
+    <ClCompile Include="PlayerMovementComponent.c" />
+    <ClCompile Include="Primitive.c" />
+    <ClCompile Include="Assignment.c" />
+    <ClCompile Include="RaycastProjectileComponent.c" />
+    <ClCompile Include="RenderLayer.c" />
+    <ClCompile Include="OptionsState.c" />
+    <ClCompile Include="ParalaxBackgroundComponent.c" />
+    <ClCompile Include="PhysicsManager.c" />
+    <ClCompile Include="PhysicsTestState.c" />
+    <ClCompile Include="Physics_BroadPhase.c" />
+    <ClCompile Include="Physics_Layers.c" />
+    <ClCompile Include="Physics_NarrowPhase.c" />
+    <ClCompile Include="Physics_Resolver.c" />
+    <ClCompile Include="Player.c" />
+    <ClCompile Include="RandGen.c" />
+    <ClCompile Include="RenderComponent.c" />
+    <ClCompile Include="RigidbodyComponent.c" />
+    <ClCompile Include="RenderScoreComponent.c" />
+    <ClCompile Include="ScoreLog.c" />
+    <ClCompile Include="ShipSelectStackState.c" />
+    <ClCompile Include="ShipSelectState.c" />
+    <ClCompile Include="ShootComponent.c" />
+    <ClCompile Include="ShotLogData.c" />
+    <ClCompile Include="SimpleAIComponent.c" />
+    <ClCompile Include="Sound.c" />
+    <ClCompile Include="Sprite.c" />
+    <ClCompile Include="StackState.c" />
+    <ClCompile Include="StandardMeshGroups.c" />
+    <ClCompile Include="TestStackState.c" />
+    <ClCompile Include="Text.c" />
+    <ClCompile Include="Texture.c" />
+    <ClCompile Include="ThankYouStackState.c" />
+    <ClCompile Include="ThankYouState.c" />
+    <ClCompile Include="Time.c" />
+    <ClCompile Include="TransformComponent.c" />
+    <ClCompile Include="TutorialStackState.c" />
+    <ClCompile Include="Vector2.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="AbilityComponent.h" />
+    <ClInclude Include="AIForwardShoot.h" />
+    <ClInclude Include="AIGraph.h" />
+    <ClInclude Include="AIManager.h" />
+    <ClInclude Include="AIMarkerComponent.h" />
+    <ClInclude Include="AISwarm.h" />
+    <ClInclude Include="AISwarmAgent.h" />
+    <ClInclude Include="AITurretComponent.h" />
+    <ClInclude Include="AssetTable.h" />
+    <ClInclude Include="AutoLaserComponent.h" />
+    <ClInclude Include="BarComponent.h" />
+    <ClInclude Include="BarTestState.h" />
+    <ClInclude Include="BlackHoleComponent.h" />
+    <ClInclude Include="BombAbilityComponent.h" />
+    <ClInclude Include="BombProjectileComponent.h" />
+    <ClInclude Include="ButtonComponent.h" />
+    <ClInclude Include="Camera.h" />
+    <ClInclude Include="ColeTestState.h" />
+    <ClInclude Include="ColliderComponent.h" />
+    <ClInclude Include="CollisionDamageComponent.h" />
+    <ClInclude Include="CollisionDestroyComponent.h" />
+    <ClInclude Include="CollisionSubject.h" />
+    <ClInclude Include="Colors.h" />
+    <ClInclude Include="Component.h" />
+    <ClInclude Include="CurtainMissileComponent.h" />
+    <ClInclude Include="DashAbilityComponent.h" />
+    <ClInclude Include="DelayedMissileComponent.h" />
+    <ClInclude Include="DigiPenLogoStackState.h" />
+    <ClInclude Include="DigiPenLogoState.h" />
+    <ClInclude Include="EnemyTest.h" />
+    <ClInclude Include="EnemyTestComponent.h" />
+    <ClInclude Include="Enemy_BerserkerComponent.h" />
+    <ClInclude Include="Enemy_CapitalShipComponent.h" />
+    <ClInclude Include="Enemy_SimpleComponent.h" />
+    <ClInclude Include="Enemy_StationComponent.h" />
+    <ClInclude Include="Enemy_SuicideComponent.h" />
+    <ClInclude Include="Engine.h" />
+    <ClInclude Include="EngineProofState.h" />
+    <ClInclude Include="Entity.h" />
+    <ClInclude Include="EntityManager.h" />
+    <ClInclude Include="EntitySubject.h" />
+    <ClInclude Include="Event.h" />
+    <ClInclude Include="FailStackState.h" />
+    <ClInclude Include="Game.h" />
+    <ClInclude Include="GameplayState.h" />
+    <ClInclude Include="GameState.h" />
+    <ClInclude Include="GameStateStack.h" />
+    <ClInclude Include="GenericTorpedoComponent.h" />
+    <ClInclude Include="Graphics.h" />
+    <ClInclude Include="GraphicsManager.h" />
+    <ClInclude Include="GravMissileAbilityComponent.h" />
+    <ClInclude Include="GravTorpedoComponent.h" />
+    <ClInclude Include="HealthComponent.h" />
+    <ClInclude Include="HealthSubject.h" />
+    <ClInclude Include="AbilitySubject.h" />
+    <ClInclude Include="HUDScore.h" />
+    <ClInclude Include="InputEvent.h" />
+    <ClInclude Include="InputGatherComponent.h" />
+    <ClInclude Include="InputTest.h" />
+    <ClInclude Include="IntroStackState.h" />
+    <ClInclude Include="IntroState.h" />
+    <ClInclude Include="JumpgateComponent.h" />
+    <ClInclude Include="KillAssignment.h" />
+    <ClInclude Include="LaserComponent.h" />
+    <ClInclude Include="LevelGenNormal.h" />
+    <ClInclude Include="LevelMarker.h" />
+    <ClInclude Include="LevelState.h" />
+    <ClInclude Include="LifetimeComponent.h" />
+    <ClInclude Include="Log.h" />
+    <ClInclude Include="MainMenuStackState.h" />
+    <ClInclude Include="MainMenuState.h" />
+    <ClInclude Include="Matrix3x3.h" />
+    <ClInclude Include="MeshGroup.h" />
+    <ClInclude Include="MissileBarrageComponent.h" />
+    <ClInclude Include="MissileComponent.h" />
+    <ClInclude Include="OptionsStackState.h" />
+    <ClInclude Include="ParticleSystem.h" />
+    <ClInclude Include="PausedStackState.h" />
+    <ClInclude Include="PlayerHealthComponent.h" />
+    <ClInclude Include="PlayerHUD.h" />
+    <ClInclude Include="PlayerHUDControllerComponent.h" />
+    <ClInclude Include="PlayerMovementComponent.h" />
+    <ClInclude Include="Primitive.h" />
+    <ClInclude Include="Assignment.h" />
+    <ClInclude Include="RaycastProjectileComponent.h" />
+    <ClInclude Include="RenderLayer.h" />
+    <ClInclude Include="OptionsState.h" />
+    <ClInclude Include="ParalaxBackgroundComponent.h" />
+    <ClInclude Include="PhysicsManager.h" />
+    <ClInclude Include="PhysicsTestState.h" />
+    <ClInclude Include="Physics_BroadPhase.h" />
+    <ClInclude Include="Physics_Layers.h" />
+    <ClInclude Include="Physics_NarrowPhase.h" />
+    <ClInclude Include="Physics_Resolver.h" />
+    <ClInclude Include="Player.h" />
+    <ClInclude Include="RandGen.h" />
+    <ClInclude Include="RenderComponent.h" />
+    <ClInclude Include="RigidbodyComponent.h" />
+    <ClInclude Include="RenderScoreComponent.h" />
+    <ClInclude Include="ScoreLog.h" />
+    <ClInclude Include="ShipSelectStackState.h" />
+    <ClInclude Include="ShipSelectState.h" />
+    <ClInclude Include="ShootComponent.h" />
+    <ClInclude Include="ShotLogData.h" />
+    <ClInclude Include="SimpleAIComponent.h" />
+    <ClInclude Include="Sound.h" />
+    <ClInclude Include="Sprite.h" />
+    <ClInclude Include="StackState.h" />
+    <ClInclude Include="StandardMeshGroups.h" />
+    <ClInclude Include="TestStackState.h" />
+    <ClInclude Include="Text.h" />
+    <ClInclude Include="Texture.h" />
+    <ClInclude Include="ThankYouStackState.h" />
+    <ClInclude Include="ThankYouState.h" />
+    <ClInclude Include="Time.h" />
+    <ClInclude Include="TransformComponent.h" />
+    <ClInclude Include="TutorialStackState.h" />
+    <ClInclude Include="Unreferenced_Parameter.h" />
+    <ClInclude Include="Vector2.h" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>

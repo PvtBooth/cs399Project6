@@ -1,0 +1,141 @@
+Cole Astaire
+Role: Producer
+Systems: Input
+Files:
+InputEvent.c
+Input.c
+InputTest.c
+Controls.c
+Actions.c
+
+Israel Zevenbergen
+Role: Test Manager
+Systems: High Score, Particles
+Files:
+ParticleSystem.c
+ParticleController.c
+ScoreLog.c
+
+
+
+Evam Kau
+Role: Design Director
+Systems: AI, Level Generation, Phyics, Abilities, Enemies
+Files: 
+Physics_BroadPhase.c
+AISwarm.c
+PhysicsManager.c 
+RigidbodyComponent.c
+Camera.c
+Physics_NarrowPhase.c
+PhysicsTestState.c
+AISwarmAgent.c
+TransformComponent.c
+Physics_Resolver.c
+AssetTable.c
+Matrix3x3.c
+Enemy_SuicideComponent.c
+Vector2.c
+AutoLaserComponent.c
+Log.c
+AITurretComponent.c
+BombProjectileComponent.c
+CurtainMissileComponent.c
+Enemy_StationComponent.c
+AIForwardShoot.c
+JumpgateComponent.c
+AIMarkerComponent.c
+BombAbilityComponent.c
+DelayedMissileComponent.c
+AIManager.c
+DashAbilityComponent.c
+RaycastProjectileComponent.c
+StandardMeshGroups.c
+Enemy_CapitalShipComponent.c
+Enemy_SimpleComponent.c
+AbilityComponent.c
+EnemyTestComponent.c
+Colors.c
+KillAssignment.c
+Physics_Layers.c
+AIGraph.c
+Assignment.c
+InputGatherComponent.c
+PlayerMovementComponent.c
+EnemyTest.c
+ShotLogData.c
+Time.c
+
+
+Ryan Booth
+Role: Product Manager
+Systems: Menus, States, Sound, Score, HUD
+Files:
+ShipSelectStackState.c
+Text.c
+MainMenuStackState.c
+Sound.c
+HUDScore.c
+OptionsStackState.c
+TutorialStackState.c
+MainMenuState.c
+OptionsState.c
+IntroStackState.c
+FailStackState.c
+ThankYouStackState.c
+ShipSelectState.c
+DigiPenLogoState.c
+IntroState.c
+DigiPenLogoStackState.c
+ThankYouState.c
+RenderScoreComponent.c
+PausedState.c
+
+Henry Brobeck
+Role: Tech Director
+Systems: State Manager, Graphics, Engine Architecture, Entity/Component, Abilities
+Files: 
+Entity.c
+BarComponent.c
+TestStackState.c
+RenderComponent.c
+MissileComponent.c
+Graphics.c
+MissileBarrageComponent.c
+EntityManager.c
+MeshGroup.c
+GravMissileAbilityComponent.c
+PlayerHUDControllerComponent.c
+GravTorpedoComponent.c
+GameStateStack.c
+GraphicsManager.c
+PlayerHealthComponent.c
+HealthComponent.c
+ShootComponent.c
+HUDBarComponent.c
+PausedStackState.c
+LaserComponent.c
+GameState.c
+LevelMarker.c
+BarTestState.c
+Enemy_BerserkerComponent.c
+SimpleAIComponent.c
+Sprite.c
+Engine.c
+PlayerHUD.c
+GenericTorpedoComponent.c
+Component.c
+BlackHoleComponent.c
+CollisionDamageComponent.c
+SpriteComponent.c
+Main.c
+Primitive.c
+Texture.c
+LifetimeComponent.c
+Game.c
+RandGen.c
+CollisionDestroyComponent.c
+CollisionSubject.c
+HealthSubject.c
+AbilitySubject.c
+EntitySubject.c
