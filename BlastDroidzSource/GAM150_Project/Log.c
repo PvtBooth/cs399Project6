@@ -67,6 +67,8 @@ static void LogStatePush(void *state);
 
 static void LogStatePop(void *state);
 
+static void LogSystemTime(void *state);
+
 static const char* GetTeam(bool isPlayer);
 
 //static void GetProgramPath(HINSTANCE instanceH);
@@ -255,6 +257,14 @@ static void LogStatePop(void *state)
 {
   LogDataStatePop *data = (LogDataStatePop*)state;
   fprintf_s(logFile, "%s", data->state->name);
+}
+
+static void LogSystemTime(void * state)
+{
+  UNREFERENCED_PARAMETER(state);
+  //LogDataSystemTime *data = (LogDataSystemTime*)state;
+
+
 }
 
 static const char* GetTeam(bool isPlayer)

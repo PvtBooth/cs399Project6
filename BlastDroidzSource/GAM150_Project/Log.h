@@ -107,6 +107,12 @@ typedef struct LogDataStatePop
   StackState *state;
 } LogDataStatePop;
 
+typedef struct LogDataSystemTime
+{
+  Time *time;
+  const char * system_name;
+} LogDataSystemTime;
+
 /*------------------------------------------------------------------------------
 // Public Variables:
 //----------------------------------------------------------------------------*/

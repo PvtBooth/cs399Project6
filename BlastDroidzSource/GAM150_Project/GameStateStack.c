@@ -185,6 +185,7 @@ StackState* GameStateStack_PopState()
   Log_LogData(LOG_TYPE_STATEPOP, genericData, &popData);
 
   removeState = tail;
+  Time_ResetStateTime();
   return tail;
 }
 

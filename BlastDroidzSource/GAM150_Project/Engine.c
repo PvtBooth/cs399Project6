@@ -131,7 +131,9 @@ float Engine_UpdateStart(void)
  */
 void Engine_UpdateEnd()
 {
-  
+  LogDataTime timeData;
+  timeData.time = Time_Get();
+  Log_LogData(LOG_TYPE_TIME, ((LogDataGeneric){"Engine.c"}), &timeData);
   AESysFrameEnd();
 }
 
