@@ -63,4 +63,6 @@ void Graphics_DrawRect(Vector2 pos, Vector2 size, float rotation, float r, float
 
 AEGfxVertexList *Graphics_GetUnitMesh();
 
+HINSTANCE getHInstance();
+
 /*----------------------------------------------------------------------------*/

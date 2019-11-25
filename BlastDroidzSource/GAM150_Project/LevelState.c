@@ -37,6 +37,7 @@
 #include "ScoreLog.h"
 #include "MainMenuState.h"
 #include "Physics_BroadPhase.h"
+#include "Log.h"
 
 
 /*------------------------------------------------------------------------------
@@ -131,6 +132,10 @@ void LevelState_NextLevel()
 
 static void Init(StackState *self)
 {
+  Log_Init(getHInstance());
+
+  Log_LogData(LOG_TYPE_STRING, ((LogDataGeneric){"LevelState.c"}), "Level Start");
+
   self->entityManager = EntityManager_Create(self);
   self->graphicsManager = GraphicsManager_Create(self);
 
@@ -245,6 +250,10 @@ static void Exit(StackState *self)
   Physics_BroadPhase_FreeGrid();
 
   AEGfxSetBackgroundColor(0, 0, 0);
+
+  Log_LogData(LOG_TYPE_STRING, ((LogDataGeneric){"LevelState.c"}), "Level Clean Exit");
+
+  Log_Exit();
 }
 
 static bool InputHandle(StackState *self, InputEvent *inputEvent)

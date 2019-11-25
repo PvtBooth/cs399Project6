@@ -81,7 +81,7 @@ int gGameRunning = 1;
 //}
 int WINAPI WinMain(HINSTANCE instanceH, HINSTANCE prevInstanceH, LPSTR command_line, int show)
 {
-  Log_Init(instanceH);
+  //Log_Init(instanceH);
 
   Log_LogData(LOG_TYPE_STRING, ((LogDataGeneric){"Main.c"}), "Game Start");
 
@@ -112,7 +112,7 @@ int WINAPI WinMain(HINSTANCE instanceH, HINSTANCE prevInstanceH, LPSTR command_l
 
   Log_LogData(LOG_TYPE_STRING, ((LogDataGeneric){"Main.c"}), "Game Clean Exit");
 
-  Log_Exit();
+  //Log_Exit();
 
   return 0;
 }

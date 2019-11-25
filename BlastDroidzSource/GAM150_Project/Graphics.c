@@ -52,6 +52,8 @@ static AESysInitInfo sysInitInfo;
 static int windowWidth = 1280; //Width of the window
 static int windowHeight = 800; //Height of the window
 
+static bool g_initialized = false;
+
 /*------------------------------------------------------------------------------
 // Private Function Declarations:
 //----------------------------------------------------------------------------*/
@@ -107,6 +109,8 @@ void Graphics_Init(HINSTANCE instanceH, HINSTANCE prevInstanceH, LPSTR command_l
 
   //Window Title Name
   SetWindowText(AESysGetWindowHandle(), "TeamA001");
+
+  g_initialized = true;
 }
 
 /*!
@@ -246,7 +250,15 @@ AEGfxVertexList* Graphics_GetUnitMesh()
   return unitMesh;
 }
 
-void Graphics_SetWindowMode(WindowMode select)
+ HINSTANCE getHInstance()
+ {
+  if(g_initialized)
+   return sysInitInfo.mAppInstance;
+
+  return NULL;
+ }
+
+ void Graphics_SetWindowMode(WindowMode select)
 {
     //Get the desktop resolution
     desktop = Graphics_GetDesktopResolution();
