@@ -159,8 +159,35 @@ static void Update(StackState *self, float dt)
   LevelState* state = (LevelState*)self;
 
   Camera_Update(dt);
+  
+  f64 l_current;
+  AEGetTime(&l_current);
+
+  //Orig
   PhysicsManager_Update(dt);
+
+  f64 l_last;
+  AEGetTime(&l_last);
+
+  float l_delta = (float)(l_last - l_current);
+
+  LogDataSystemTime l_data;
+  l_data.time = l_delta;
+  l_data.system_name = "Physics";
+
+  Log_LogData(LOG_TYPE_SYSTEMTIME, ((LogDataGeneric){"Engine.c"}), &l_data);
+
+  AEGetTime(&l_current);
+
+  //Orig
   EntityManager_Update(self->entityManager, dt);
+
+  AEGetTime(&l_last);
+  l_delta = (float)(l_last - l_current);
+  l_data.time = l_delta;
+  l_data.system_name = "Entities";
+
+  Log_LogData(LOG_TYPE_SYSTEMTIME, ((LogDataGeneric){"Engine.c"}), &l_data);
     
   if (!state->gameplayIsRunning)
   {
