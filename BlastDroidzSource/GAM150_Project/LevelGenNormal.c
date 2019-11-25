@@ -67,6 +67,7 @@ static bool SpawnPlanet(float radius, StackState *state);
 static bool SpawnAsteroid(StackState *state, int minRadius, int maxRadius);
 static bool SpawnAsteroidAtPoint(StackState *state, Vector2 point);
 static bool SpawnJumpgate(StackState *state);
+static bool SpawnBasicEnemyCluster(StackState* state, int enemyPoints);
 static bool SpawnEnemies(StackState *state, int enemyPoints);
 static bool SpawnEnemyPoint(StackState *state);
 static bool SpawnEnemyStation(StackState *state);
@@ -85,15 +86,12 @@ void LevelGenNormal_Generate(float levelRadius, StackState *state)
   enemyCount = 0;
 
   int i = 0;
-  int attempts = 0;
   levelRadius = max(levelRadius, 1500);
   PhysicsManager_NewGridFromCount(levelRadius * 2, levelRadius * 2, 25, 25);
 
-  SpawnPlanet(levelRadius * (RandGen_Float() * 0.1f + 0.1f), state);
+  //SpawnPlanet(levelRadius * (RandGen_Float() * 0.1f + 0.1f), state);
 
-  while (!SpawnJumpgate(state));
-
-  int enemyPoints = 1750 + 4 * levelNumber * (levelNumber + 40);
+  int enemyPoints = 1000 + 4 * levelNumber * (levelNumber + 40);
   int players = 0;
   for (i = 0; i < 4; i++)
   {
@@ -103,61 +101,61 @@ void LevelGenNormal_Generate(float levelRadius, StackState *state)
     }
   }
   enemyPoints *= (int)(0.5f + players / 2.f);
-  //SpawnEnemies(state, enemyPoints);
+  SpawnBasicEnemyCluster(state, enemyPoints);
   
-  int rings = RandGen_Int(1, 3);
-  for (i = 0; i < rings; i++)
-  {
-    int minRadius = RandGen_Int((int)(levelRadius * 0.3f), (int)(levelRadius * 0.9f));
-    int maxRadius = RandGen_Int(minRadius, (int)(levelRadius * 0.9f));
-    int j = 0;
+  //int rings = RandGen_Int(1, 3);
+  //for (i = 0; i < rings; i++)
+  //{
+  //  int minRadius = RandGen_Int((int)(levelRadius * 0.3f), (int)(levelRadius * 0.9f));
+  //  int maxRadius = RandGen_Int(minRadius, (int)(levelRadius * 0.9f));
+  //  int j = 0;
 
-    if (maxRadius - minRadius > 0.5f / rings * levelRadius)
-    {
-      minRadius = (int)(maxRadius - 0.5f / rings * levelRadius);
-    }
-    int asteroidCount = max((maxRadius - minRadius) * (maxRadius - minRadius) / 50000, 60);
+  //  if (maxRadius - minRadius > 0.5f / rings * levelRadius)
+  //  {
+  //    minRadius = (int)(maxRadius - 0.5f / rings * levelRadius);
+  //  }
+  //  int asteroidCount = max((maxRadius - minRadius) * (maxRadius - minRadius) / 50000, 60);
 
-    while (j < asteroidCount)
-    {
-      if (SpawnAsteroid(state, minRadius, maxRadius))
-      {
-        j++;
-        attempts = 0;
-      }
-      attempts++;
-      if (attempts > 50)
-      {
-        j++;
-      }
-    }
-  }
+  //  while (j < asteroidCount)
+  //  {
+  //    if (SpawnAsteroid(state, minRadius, maxRadius))
+  //    {
+  //      j++;
+  //      attempts = 0;
+  //    }
+  //    attempts++;
+  //    if (attempts > 50)
+  //    {
+  //      j++;
+  //    }
+  //  }
+  //}
 
-  int clusters = RandGen_Int(0, 10 - (rings * 2));
-  for (i = 0; i < clusters; i++)
-  {
-    Vector2 point = Vector2_Scale(Vector2_FromAngle(RandGen_Float() * 2 * PI), (float)RandGen_Int((int)(levelRadius * 0.5f), (int)(levelRadius * 0.8f)));
-    float radius = (RandGen_Float() * 0.15f + 0.05f) * levelRadius;
+  //int clusters = RandGen_Int(0, 10 - (rings * 2));
+  //for (i = 0; i < clusters; i++)
+  //{
+  //  Vector2 point = Vector2_Scale(Vector2_FromAngle(RandGen_Float() * 2 * PI), (float)RandGen_Int((int)(levelRadius * 0.5f), (int)(levelRadius * 0.8f)));
+  //  float radius = (RandGen_Float() * 0.15f + 0.05f) * levelRadius;
 
-    int asteroidCount = RandGen_Int(1, (int)max(radius * radius / 50000, 20));
+  //  int asteroidCount = RandGen_Int(1, (int)max(radius * radius / 50000, 20));
 
-    int j = 0;
-    while (j < asteroidCount)
-    {
-      if (SpawnAsteroidAtPoint(state, Vector2_Add(point, Vector2_Scale(Vector2_FromAngle(RandGen_Float() * 2 * PI), sqrtf(RandGen_Float()) * radius))))
-      {
-        j++;
-        attempts = 0;
-      }
-      attempts++;
-      if (attempts > 50)
-      {
-        j++;
-      }
-    }
-  }
+  //  int j = 0;
+  //  while (j < asteroidCount)
+  //  {
+  //    if (SpawnAsteroidAtPoint(state, Vector2_Add(point, Vector2_Scale(Vector2_FromAngle(RandGen_Float() * 2 * PI), sqrtf(RandGen_Float()) * radius))))
+  //    {
+  //      j++;
+  //      attempts = 0;
+  //    }
+  //    attempts++;
+  //    if (attempts > 50)
+  //    {
+  //      j++;
+  //    }
+  //  }
+  //}
 
-  SpawnEnemies(state, enemyPoints);
+  //SpawnEnemies(state, enemyPoints);
 
   Assignment_Set(KillAssignment_Create((int)(enemyCount / (3 / max(players / 2.f, 1)))));
 
@@ -338,6 +336,40 @@ static bool SpawnAsteroidAtPoint(StackState *state, Vector2 point)
     return true;
   }
   return false;
+}
+
+static bool SpawnBasicEnemyCluster(StackState* state, int enemyPoints)
+{
+	int i = 0;
+	int pointCount = 1;
+	int swarmMinPoints = (int)(enemyPoints / pointCount * 0.85f);
+	int swarmMaxPoints = (int)(enemyPoints / pointCount * 1.15f);
+
+	while (i < pointCount)
+	{
+		if (SpawnEnemyPoint(state))
+		{
+			i++;
+		}
+	}
+
+	AIMarker* marker = AIGraph_GetMarkerHead();
+	for (i = 0; i < pointCount; i++)
+	{
+		int swarmPoints = RandGen_Int(swarmMinPoints, swarmMaxPoints);
+		Entity* markerEntity = AIMarker_GetEntity(marker);
+		Vector2 position = TransformComponent_GetPosition(markerEntity->transformComponent);
+		while (swarmPoints > 0)
+		{
+			Vector2 modPosition = Vector2_AddFloats(position, RandGen_Float() * 400 - 200, RandGen_Float() * 400 - 200);
+			swarmPoints -= SpawnEnemyShip(state, modPosition);
+			enemyCount++;
+		}
+		if (AIMarker_GetNext(marker))
+			marker = AIMarker_GetNext(marker);
+	}
+
+	return true;
 }
 
 static bool SpawnEnemies(StackState *state, int enemyPoints)

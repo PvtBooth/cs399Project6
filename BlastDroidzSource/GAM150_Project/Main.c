@@ -24,6 +24,7 @@
 #include "StandardMeshGroups.h"
 #include "AssetTable.h"
 #include "RandGen.h"
+#include "ShipSelectStackState.h"
 
 
 // ---------------------------------------------------------------------------
@@ -90,7 +91,7 @@ int WINAPI WinMain(HINSTANCE instanceH, HINSTANCE prevInstanceH, LPSTR command_l
   GameStateStack_Init();
   /*GameStateStack_PushState(BarTestState_Create());*/
   //GameStateStack_PushState(TestStackState_Create());
-  GameStateStack_PushState(DigiPenLogoStackState_Create());
+  GameStateStack_PushState(ShipSelectStackState_Create());
   //GameStateStack_PushState(LevelState_Create());
   //GameStateStack_PushState(MainMenuStackState_Create());
   GameStateStack_Update(0.0f);
