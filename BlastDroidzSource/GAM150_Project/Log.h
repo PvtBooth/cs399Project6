@@ -117,6 +117,8 @@ typedef struct LogDataStatePop
 
 void Log_Init(HINSTANCE instanceH);
 
+void Log_Reset();
+
 void Log_LogData(LOG_TYPE logType, LogDataGeneric genericLogData, void *excessData);
 
 void Log_Exit(void);

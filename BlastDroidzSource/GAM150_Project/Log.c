@@ -104,6 +104,8 @@ static LogTypeData logTable[LOG_TYPE_MAX] =
  */
 void Log_Init(HINSTANCE instanceH)
 {
+  Log_Reset();
+
   UNREFERENCED_PARAMETER(instanceH);
   char logIDNumber[128] = {0};
   time_t currentTime = time(NULL);
@@ -112,7 +114,7 @@ void Log_Init(HINSTANCE instanceH)
   _ltoa_s(timeLong, logIDNumber, 128, 10);
 
   strcat_s(logFileID, 256, logIDNumber);
-  strcat_s(logFileID, 256, ".log");
+  strcat_s(logFileID, 256, ".csv");
 
   //We no longer want to spawn the watcher program.
   //SpawnWatcher(instanceH);
@@ -120,6 +122,25 @@ void Log_Init(HINSTANCE instanceH)
   strcat_s(logFilePath, 256, logFileID);
 
   fopen_s(&logFile, logFilePath, "wt");
+}
+
+void Log_Reset()
+{
+  //logPath[256] = { ".\\Logs\\" };
+  //logFilePath[256] = { ".\\Logs\\" };
+  //logFileID[256] = { "GAM150_Project_" };
+  int l_iter = 0;
+  
+  for(;l_iter < 256; ++l_iter)
+  {
+    logPath[l_iter] = '\0';
+    logFilePath[l_iter] = '\0';
+    logFileID[l_iter] = '\0';
+  }
+
+  strcat_s(logPath, 256, ".\\Logs\\");
+  strcat_s(logFilePath, 256, ".\\Logs\\");
+  strcat_s(logFileID, 256, "GAM150_Project_");
 }
 
 /*!
@@ -135,13 +156,15 @@ void Log_Init(HINSTANCE instanceH)
  */
 void Log_LogData(LOG_TYPE logType, LogDataGeneric genericLogData, void *excessData)
 {
-  if (logFile)
+  if (logFile != NULL)
   {
-    fprintf_s(logFile, "%f,", Time_Get()->sinceGameStart);
+    fprintf_s(logFile, "%f,", Time_Get()->sinceStateStart);
     fprintf_s(logFile, "%s,", genericLogData.sourceFile);
     fprintf_s(logFile, "%s,", logTable[logType].name);
     (*logTable[logType].function)(excessData);
-    fprintf_s(logFile, ",END\n");
+    
+    //fprintf_s(logFile, ",END\n");
+    fprintf_s(logFile, "\n");
   }
 }
 
@@ -151,9 +174,10 @@ void Log_LogData(LOG_TYPE logType, LogDataGeneric genericLogData, void *excessDa
  */
 void Log_Exit(void)
 {
-  if (logFile)
+  if (logFile != NULL)
   {
     fclose(logFile);
+    logFile = NULL;
   }
 }
 
