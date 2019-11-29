@@ -1,0 +1,205 @@
+.red_bar {
+  fill: red;
+}
+
+.green_bar {
+  fill: green;
+}
+
+.axis text {
+  font: 10px sans-serif;
+}
+
+.axis path,
+.axis line {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.x.axis path {
+  fill: none;
+  stroke: #000;
+  shape-rendering: crispEdges;
+}
+
+.shares_bar {
+  fill: mediumorchid;
+}
+
+.shares_bar:hover {
+  fill: purple ;
+}
+
+.loadingwheel {
+  position: fixed;
+  left: 90%;
+  z-index: 2;
+  width: 152px;
+}
+
+.loader {
+  border: 16px solid #f3f3f3;
+  border-radius: 50%;
+  border-top: 16px solid #3498db;
+  width: 120px;
+  height: 120px;
+  animation: spin 2s linear infinite;
+}
+
+@keyframes spin {
+  0% { transform: rotate(0deg); }
+  100% { transform: rotate(360deg); }
+}
+
+.graphs {
+  border: 16px solid gray;
+  border-radius: 25px;
+}
+
+.svg {
+  border: 4px solid darkgray;
+  border-radius: 25px;
+  position: relative;
+  left: 7px;
+  top: 8px;
+}
+
+.text {
+  position: relative;
+  left: 8px;
+  top: 8px;
+  text-align: center;
+  
+  border: 4px solid dimgray;
+}
+
+.empty {
+  height: 10px;
+}
+
+.button {
+  background-color: black;
+  color: white;
+  padding: 15px 32px;
+  text-align: center;
+  display: inline-block;
+  font-size: 16px;
+  border-radius: 10px;
+}
+
+.bigmenu {
+  display: flex;
+}
+
+.menu {
+  position relative;
+  flex-grow: 1;
+  display: flex;
+  
+  width: 50%;
+  height: 125px;
+}
+
+.item {
+  position: relative;
+  flex-grow: 1;
+  
+  margin-top: auto;
+  margin-bottom: auto;
+}
+
+.item2 {
+  position: relative;
+  flex-grow: 1;
+  
+  right: 50px;
+  width: 300px;
+  height: 60px;
+  
+  margin-top: auto;
+  margin-bottom: auto;
+  
+  bottom: 30px;
+}
+
+.pan {
+  position: absolute;
+  left: 1100px;
+  bottom: 79%;
+  width: 145px;
+}
+
+label {
+    display: block;
+    font: 1rem 'Fira Sans', sans-serif;
+}
+
+input,
+label {
+    margin: .4rem 0;
+}
+
+.d3-tip {
+  line-height: 1;
+  font-weight: bold;
+  padding: 12px;
+  background: rgba(0, 0, 0, 0.8);
+  color: #fff;
+  border-radius: 2px;
+}
+
+/* Creates a small triangle extender for the tooltip */
+.d3-tip:after {
+  box-sizing: border-box;
+  display: inline;
+  font-size: 10px;
+  width: 100%;
+  line-height: 1;
+  color: rgba(0, 0, 0, 0.8);
+  content: "\25BC";
+  position: absolute;
+  text-align: center;
+}
+
+/* Style northward tooltips differently */
+.d3-tip.n:after {
+  margin: -1px 0 0 0;
+  top: 100%;
+  left: 0;
+}
+
+/* Tooltip text */
+.pan .tooltiptext {
+  visibility: hidden;
+  width: 120px;
+  background-color: #454545;
+  color: #fff;
+  text-align: center;
+  padding: 5px 0;
+  border-radius: 6px;
+
+ 
+  /* Position the tooltip text - see examples below! */
+  position: absolute;
+  z-index: 1;
+  top: 100%;
+  left: 50%;
+  margin-left: -60px;
+}
+
+/* Show the tooltip text when you mouse over the tooltip container */
+.pan:hover .tooltiptext {
+  visibility: visible;
+}
+
+.pan .tooltiptext::after {
+  content: " ";
+  position: absolute;
+  bottom: 100%;  /* At the top of the tooltip */
+  left: 46.55%;
+  margin-left: -5px;
+  border-width: 5px;
+  border-style: solid;
+  border-color: transparent transparent #454545 transparent;
+}

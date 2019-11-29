@@ -1,0 +1,114 @@
+<!DOCTYPE html>
+<html>
+  <head>
+
+    <title>CS399 Project6</title>
+    <link rel="stylesheet" href="styles.css">
+    <script src="https://d3js.org/d3.v5.min.js"></script>
+    <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
+
+    <!-- Fancy Calendar -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
+
+    <!-- Tooltip -->
+    <script src="d3-tip.js"></script>
+
+  </head>
+
+  <body>
+    <div class="loadingwheel">
+        <span id = "loading"> Loading... <div class="loader"></div> </span>
+      </div>
+    
+    <div class="bigmenu">
+    
+      <div class="menu">
+        <div class="item">
+          <button type="button" class="button" onclick="startSimulation()">Start Simulation</button>
+        </div>
+
+        <!-- Fancy Calendar -->
+        <div class="item">
+          <label for="start">Start date:
+            <input type="text" id="start-date">
+          </label>
+
+          <label for="end">End date:&nbsp;
+            <input type="text" id="end-date">
+          </label>
+        </div>
+
+        <div class="item">
+          <label for="strategy_selector">Select Strategy:&emsp;&ensp;
+          <select onchange="changeStrategy(this.value)">
+            <option value="s0">Short Trend</option>
+            <option value="s1">Mean Reversion</option>
+            <option value="s2">Long Hold</option>
+            <option value="s3">Bi-Trend</option>
+          </select>
+          </label>
+          
+          <label for="tax_selector">Select Tax Bracket:
+          <select onchange="changeTax(this.value)">
+            <option value="t0">10%</option>
+            <option value="t1">12%</option>
+            <option value="t2">22%</option>
+            <option value="t3">24%</option>
+            <option value="t4">32%</option>
+            <option value="t5">35%</option>
+            <option value="t6">37%</option>
+          </select>
+          </label>
+        </div>
+      </div>
+      
+      <div class="menu">
+        <div class="item2">
+          <svg class="text starting_money_graph" id="starting_money_graph"></svg>
+          <svg class="text ending_money_graph" id="ending_money_graph"></svg>
+          <svg class="text total_taxes_graph" id="total_taxes_graph"></svg>
+        </div>
+          
+        <div class="item2">
+          <svg class="text account_percentage_gain_graph" id="account_percentage_gain_graph"></svg>
+          <svg class="text average_yearly_percentage_gain_graph" id="average_yearly_percentage_gain_graph"></svg>
+          <svg class="text max_drawdown_percentage_graph" id="max_drawdown_percentage_graph"></svg>
+        </div>
+          
+        <div class="item2">
+          <svg class="text spy_percentage_gain_graph" id="spy_percentage_gain_graph"></svg>
+          <svg class="text standard_deviation_graph" id="standard_deviation_graph"></svg>
+          <svg class="text sharpe_ratio_graph" id="sharpe_ratio_graph"></svg>
+        </div>
+      </div>
+    
+    </div>
+    
+    
+
+    <!-- SVGs -->
+    <div class="graphs">
+      <svg class="svg account_value_line_chart" id="account_value_line_chart"></svg>
+      
+      <svg class="svg account_percentage_change_line_chart" id="account_percentage_change_line_chart"></svg>
+      
+      <!-- Buttons for panning -->
+      <div class="pan">
+        <span class="tooltiptext">Hold</span>
+        <button type="button" onmousedown="panLeft()" onmouseup="stopPanLeft()">Pan Left</button>
+        <button type="button" onmousedown="panRight()" onmouseup="stopPanRight()">Pan Right</button>
+      </div>
+      
+      <svg class="svg percentage_histogram" id="percentage_histogram"></svg>
+      
+      <svg class="svg stock_bar_chart" id="stock_bar_chart"></svg>
+
+      
+      <div class="empty"></div>
+    </div>
+    
+    
+    <script src="index.js"></script>
+  </body>
+</html>
