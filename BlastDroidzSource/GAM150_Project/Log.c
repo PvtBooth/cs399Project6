@@ -90,7 +90,8 @@ static LogTypeData logTable[LOG_TYPE_MAX] =
   {"L_transform", &LogTransform},
   {"L_time", &LogTime},
   {"L_StatePush", &LogStatePush},
-  {"L_StatePop", &LogStatePop}
+  {"L_StatePop", &LogStatePop},
+  {"L_system_time", &LogSystemTime}
 };
 
 /*------------------------------------------------------------------------------
@@ -261,10 +262,8 @@ static void LogStatePop(void *state)
 
 static void LogSystemTime(void * state)
 {
-  UNREFERENCED_PARAMETER(state);
-  //LogDataSystemTime *data = (LogDataSystemTime*)state;
-
-
+  LogDataSystemTime *data = (LogDataSystemTime*)state;
+  fprintf_s(logFile, "%s, %f", data->system_name, data->time);
 }
 
 static const char* GetTeam(bool isPlayer)
