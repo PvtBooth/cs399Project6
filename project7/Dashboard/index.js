@@ -1,14 +1,30 @@
-//Remove loading text
-jQuery("#loading").toggle();
 
-var startSimulation = function()
+// jQuery("#loading").toggle();
+Promise.all([
+  d3.csv("https://raw.githubusercontent.com/PvtBooth/cs399project6/master/project7/UnitTests/BOMB.csv"),
+  d3.csv("https://raw.githubusercontent.com/PvtBooth/cs399project6/master/project7/UnitTests/GRAVITAS.csv"),
+  d3.csv("https://raw.githubusercontent.com/PvtBooth/cs399project6/master/project7/UnitTests/MISSILE.csv"),
+  d3.csv("https://raw.githubusercontent.com/PvtBooth/cs399project6/master/project7/UnitTests/SPRAY.csv"),
+])
+.then(function(data) {   
+  main(data);
+})
+.catch(function(result) {
+  error(result);
+});
+
+var bombData, gravitasData, missileData, sprayData;
+function main(data)
 {
   jQuery("#loading").toggle();
-  d3.csv("https://raw.githubusercontent.com/PvtBooth/cs399project6/master/DATA.csv").then(main, error);
+  bombData = data[0];
+  gravitasData = data[1];  
+  missileData = data[2];
+  sprayData = data[3];
+  AnalyzeUnitTest(bombData);
 }
 
 // Main Data
-var time;
 var playerHealth;
 var enemyHealth;
 var numEnemies;
@@ -16,17 +32,80 @@ var numEnemies;
 var strategy = "s0";
 var DPS = 0.0;
 var DamageReceived = 0.0;
+var enemies = [];
 
-//Need to calculate
-//Graph vars
-var DailyAccountValue = [];
-var DailyPercentageChanges = [];
-var DailyPercentageChangesWithDates = [];
-var MoneyChangePerYear = [];
-var MoneyChangePerMonth = [];
-var DailyGain = [];
-var SharesOfStocks = [];
-var RenderedSharesOfStocks = [];
+// Per frame stored values
+var PerFrameData = []; // ENTRIES: Time, PlayerHP, EnemiesHP, TotalEnemies
+
+function AnalyzeUnitTest(data)
+{
+  ResetCharts();
+  PerFrameData = [];
+  enemies = [];
+  playerHealth = 100.0;
+  enemyHealth = 0.0;
+  numEnemies = 0;
+  var initialDamageTime = -1.0;
+
+  data.forEach(function(eventLog) {
+  if(eventLog.LogType === "L_spawn")
+  {
+    numEnemies++;
+    enemyHealth += 8.0;
+    enemies.push({
+      ID: eventLog.SourceID,
+      HP: 8.0
+    })
+  }
+  else if(eventLog.LogType === "L_damage")
+  {
+      var dmg = parseFloat(eventLog.Damage);
+      if(eventLog.DestinationType === "PlayerType1")
+      playerHealth -= dmg;
+    else
+    {
+      enemies.forEach(enemy => 
+      {
+        if(enemy.ID === eventLog.DestinationID)
+          enemy.HP -= dmg;
+      })
+      enemyHealth = GetEnemyTotalHP();
+    }
+    if(initialDamageTime < 0.0)
+    {
+      initialDamageTime = parseFloat(eventLog.Time);
+      PerFrameData.push({
+        Time: 0.0,
+        PlayerHP: playerHealth,
+        EnemiesHP: enemyHealth / 8.0,
+        TotalEnemies: numEnemies
+      })
+    }
+  }
+  else if(eventLog.LogType === "L_death")
+  {
+    enemies.splice(enemies.indexOf(e => e.ID === e.SourceID));
+    numEnemies--;
+  }
+  else if(eventLog.LogType === "L_time")
+  {
+    if(initialDamageTime < 0.0)
+      return;
+    PerFrameData.push({
+      Time: parseFloat(eventLog.Time) - initialDamageTime,
+      PlayerHP: playerHealth,
+      EnemiesHP: enemyHealth / 8.0,
+      TotalEnemies: numEnemies
+    });
+  }})
+  RenderDamageChart();
+}
+
+function GetEnemyTotalHP(){
+  var HP = 0.0;
+  enemies.forEach(enemy => HP += enemy.HP > 0.0 ? enemy.HP : 0.0);
+  return HP;
+}
 
 var margin = {top: 20, right: 20, bottom: 20, left: 20},
     padding = {top: 60, right: 60, bottom: 60, left: 60},
@@ -46,10 +125,6 @@ var text_margin = {top: 0, right: 0, bottom: 0, left: 0},
     text_width = text_innerWidth - text_padding.left - text_padding.right,
     text_height = text_innerHeight - text_padding.top - text_padding.bottom;
 
-// set the ranges
-var money_line_x = d3.scaleTime().range([margin.left, width]);
-var money_line_y = d3.scaleLinear().range([height, (margin.top)]);
-
 var percent_line_x = d3.scaleTime().range([margin.left, width]);
 var percent_line_y = d3.scaleLinear().range([height, (margin.top)]);
 
@@ -61,22 +136,11 @@ var percent_line_y_domain;
 
 var percent_g;
 
-// define the line
-var moneyline = d3.line()
-    .x(function(d) { return money_line_x(d.date); })
-    .y(function(d) { return money_line_y(d.money); });
-
 var percentline = d3.line()
     .x(function(d) { return percent_line_x(d.date); })
     .y(function(d) { return percent_line_y(d.change); });
 
 var percent_histogram_chart = d3.select(".percentage_histogram")
-    .attr("width", outerWidth)
-    .attr("height", outerHeight)
-    .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-var DamageChart = d3.select(".DamageChart")
     .attr("width", outerWidth)
     .attr("height", outerHeight)
     .append("g")
@@ -122,32 +186,8 @@ var panningRight = false;
 var beginningIndex = 0;
 var endingIndex = 80;
 
-var ResetVolatileData = function()
+var ResetCharts = function()
 {
-  DPS = 0.0;
-  stockValue = 0;
-  purchases = [];
-  g_sums = [];
-
-  AccountPercentageGain = 0.0;
-  AverageDailyPercentageGain = 0.0;
-  DailyStandardDeviation = 0.0;
-  YearlyPercentageGain = 0.0;
-  YearlyStandardDeviation = 0.0;
-  SharpeRatio = 0.0;
-  SPYPercentageGain = 0.0;
-  MaxDrawdownPercentage = 0.0;
-  totalTax = 0.0;
-
-  DailyAccountValue = [];
-  DailyPercentageChanges = [];
-  DailyPercentageChangesWithDates = [];
-  MoneyChangePerYear = [];
-  MoneyChangePerMonth = [];
-  DailyGain = [];
-  SharesOfStocks = [];
-  RenderedSharesOfStocks = [];
-
   beginningIndex = 0;
   endingIndex = 80;
 
@@ -164,7 +204,7 @@ var ResetVolatileData = function()
     .append("g")
     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
 
-  //money_chart
+  //Damage Chart
   clearChart("DamageChart");
   DamageChart = d3.select(".DamageChart")
     .attr("width", outerWidth)
@@ -217,7 +257,22 @@ function clearChart(chartName)
 
 var changeStrategy = function(p_strategy)
 {
-  strategy = p_strategy;
+  if(p_strategy == "s0")
+  {
+    AnalyzeUnitTest(bombData)
+  }
+  else if(p_strategy == "s1")
+  {
+    AnalyzeUnitTest(gravitasData)
+  }
+  else if(p_strategy == "s2")
+  {
+    AnalyzeUnitTest(missileData)
+  }
+  else if (p_strategy == "s3")
+  {
+    AnalyzeUnitTest(sprayData)
+  }
 }
 
 function renderPercentHistogramChart()
@@ -286,30 +341,70 @@ var bar_y_axis = bar_y.domain([0, d3.max(bins, function(d) { return d.length; })
       .text("Number of Days per Percentage Change Range");
 }
 
+
+// ============================ DAMAGE_CHART ====================================
+var DamageChart = d3.select(".DamageChart")
+    .attr("width", outerWidth)
+    .attr("height", outerHeight)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+var xScaleDamage = d3.scaleLinear().range([margin.left, width]);
+var yScaleDamage = d3.scaleLinear().range([height, (margin.top)]);
+// define the line 
+
+var PlayerHPLine = d3.line()
+    .x(function(d) { return xScaleDamage(d.Time); })
+    .y(function(d) { return yScaleDamage(d.PlayerHP); });
+
+var NumEnemiesLine = d3.line()
+    .x(function(d) { return xScaleDamage(d.Time); })
+    .y(function(d) { return yScaleDamage(d.TotalEnemies); });
+
+var EnemyHPLine = d3.line()
+    .x(function(d) { return xScaleDamage(d.Time); })
+    .y(function(d) { return yScaleDamage(d.EnemiesHP); });
+
 function RenderDamageChart()
 {
-//Money Graph
+    // Damage Graph:x Time,y1 PlayerHP,y2 EnemiesHP,y3 TotalEnemies
     // Scale the range of the data
-    money_line_x.domain(d3.extent(DailyAccountValue, function(d, i) { return d.date; }));
-    money_line_y.domain([0, d3.max(DailyAccountValue, function(d, i) { return d.money; })]);
+  xScaleDamage.domain(d3.extent(PerFrameData, function(d, i) { return d.Time; }));
+  yScaleDamage.domain([0, d3.max(PerFrameData, function(d, i) { return d.PlayerHP; })]);
 
   var DamageChart_g = DamageChart.append("g")
     .attr("transform", "translate(" + padding.left + "," + padding.top + ")");
 
         // Add the valueline path.
   DamageChart_g.append("path")
-      .data([DailyAccountValue])
+      .data([PerFrameData])
       .attr("class", "line")
-      .attr("d", moneyline)
+      .attr("d", PlayerHPLine)
       .attr("fill", "none")
       .attr("stroke", "green")
       .attr("stroke-width", 1.5);
+
+  DamageChart_g.append("path")
+    .data([PerFrameData])
+    .attr("class", "line")
+    .attr("d", NumEnemiesLine)
+    .attr("fill", "none")
+    .attr("stroke", "red")
+    .attr("stroke-width", 1.5);
+
+  DamageChart_g.append("path")
+    .data([PerFrameData])
+    .attr("class", "line")
+    .attr("d", EnemyHPLine)
+    .attr("fill", "none")
+    .attr("stroke", "orange")
+    .attr("stroke-width", 1.5);
 
     // Add the x Axis
   DamageChart_g.append("g")
     .attr("class", "x axis")
     .attr("transform", "translate(0," + height + ")")
-    .call(d3.axisBottom(money_line_x));
+    .call(d3.axisBottom(xScaleDamage));
 
     // text label for the x axis
   DamageChart_g.append("text")             
@@ -317,14 +412,13 @@ function RenderDamageChart()
             "translate(" + ((width/2) + margin.left) + " ," + 
                            (height + (margin.bottom) + margin.top) + ")")
       .style("text-anchor", "middle")
-      .text("Date");
-
+      .text("Time");
 
     // Add the y Axis
   DamageChart_g.append("g")
     .attr("class", "y axis")
     .attr("transform", "translate(" + margin.left + ",0)")
-    .call(d3.axisLeft(money_line_y));
+    .call(d3.axisLeft(yScaleDamage));
 
   // text label for the y axis
   DamageChart.append("text")
@@ -333,17 +427,17 @@ function RenderDamageChart()
       .attr("x",0 - (((height)/1.8) + margin.top + margin.bottom) )
       .attr("dy", "1em")
       .style("text-anchor", "middle")
-      .text("Money");
+      .text("Damage");
 
   DamageChart.append("text")
       .attr("x", 0 + (outerWidth/2))
       .attr("y", 0)
       .style("text-anchor", "middle")
-      .text("Account Value Over Time");
+      .text("Unit Test Analysis");
 }
+
 var clearIntervalIDRight;
 var clearIntervalIDLeft;
-
 function panLeft()
 {
   panningLeft = true;
@@ -586,7 +680,7 @@ var shares_x = d3.scaleBand()
       .text("Top Most Purchased Stocks");
 }
 
-function renderTextData()
+function RenderTextData()
 { 
   DPSText.append("text")
         .attr("x", 50)             
@@ -697,95 +791,6 @@ function ClampSharesOfStockArray()
       return 0;
     });
   }
-}
-
-function main(data)
-{
-    //Reset any data that needs to be cleared before a strategy is run.
-    ResetVolatileData();
-    // Get all data 
-    stocks = Object.keys(data[0]);
-    stocks.shift();
-    dates = data.map(d => d.Date);
-    prices = data.reduce((map, entry) => 
-    {
-        map[entry.Date] = entry;
-        return map;
-    }, {});
-
-    var dateRange = dates.slice(dates.indexOf(startDate), dates.indexOf(endDate));
-    DailyAccountValue.push({ date: new Date(dates[0]), money: currentMoney + stockValue });
-    dateRange.forEach(function(date)
-    {
-        // console.log(date);
-        if(strategy == "s0")
-        {
-          LinearlyWeightedMovingAverage(date, 20, 0.0001);
-        }
-        else if(strategy == "s1")
-        {
-          MeanMethod(date, .2);
-        }
-        else if(strategy == "s2")
-        {
-          RandomStrategy(date, 0.5); // almost 5 stocks per day
-        }
-        else if (strategy == "s3")
-        {
-            SimpleMovingAverageMethod(date, 50, 200, 1);
-        }
-
-
-        stockValue = GetTotalStockValue(date);
-        CalculatePercentageGain();
-        CheckDrawdown();
-        
-        DailyAccountValue.push({ date: new Date(date), money: currentMoney + stockValue});
-        // console.log("Stocks Value: " + stockValue);
-        // console.log("Cash Value: " + currentMoney);
-        // console.log("Percentage Gain: " + AccountPercentageGain);
-        // console.log("");
-    });
-    DailyAccountValue.shift();
-
-    //CalculateMoneyChangePerYear();
-
-    AccountPercentageGain = (currentMoney + stockValue - startingMoney)* 100 / startingMoney;
-    var avg = 0;
-    DailyPercentageChanges.forEach(d => { avg += d; });
-    AverageDailyPercentageGain = avg / DailyPercentageChanges.length;
-
-    var variance = 0;
-    DailyPercentageChanges.forEach(d => { variance += Math.pow(d - AverageDailyPercentageGain, 2)});
-    DailyStandardDeviation = Math.sqrt(variance / DailyPercentageChanges.length);
-
-    YearlyPercentageGain = (Math.pow(1+(AverageDailyPercentageGain/100), 252) - 1) * 100;
-    YearlyStandardDeviation = DailyStandardDeviation*Math.sqrt(252);
-    SharpeRatio = ((YearlyPercentageGain) - 0.035) / YearlyStandardDeviation;
-    SPYPercentageGain = (GetPrice(endDate, " SPY") - GetPrice(startDate, " SPY")) * 100 / GetPrice(startDate, " SPY");
-    calculateTaxes();
-    
-
-    //Remove loading text
-    jQuery("#loading").toggle();
-
-    //Setup percent line ending index
-    initializeEndingIndex(endingIndex);
-
-    //Render The Graphs
-    RenderDamageChart();
-
-    renderPercentHistogramChart();
-
-    renderPercentChangeChart();
-
-    renderTextData();
-      
-
-  //Shares of each stock bought graph
-  ClampSharesOfStockArray();
-
-  renderSharesOfStocksChart();
 }
 
 function error(result){
