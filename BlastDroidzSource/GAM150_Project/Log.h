@@ -35,7 +35,6 @@ typedef enum LOG_TYPE
   LOG_TYPE_TIME,
   LOG_TYPE_STATEPUSH,
   LOG_TYPE_STATEPOP,
-  LOG_TYPE_SYSTEMTIME,
 
   LOG_TYPE_MAX
 } LOG_TYPE;
@@ -110,7 +109,7 @@ typedef struct LogDataStatePop
 
 typedef struct LogDataSystemTime
 {
-  float time;
+  Time *time;
   const char * system_name;
 } LogDataSystemTime;
 

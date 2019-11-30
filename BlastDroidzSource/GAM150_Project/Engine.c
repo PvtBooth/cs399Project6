@@ -114,54 +114,12 @@ float Engine_UpdateStart(void)
     debugCounter = 0;
   }
 
-  f64 l_current;
-  AEGetTime(&l_current);
-
-  //Orig
   AIManager_Update(delta);
-
-  f64 l_last;
-  AEGetTime(&l_last);
-
-  float l_delta = (float)(l_last - l_current);
-
-  LogDataSystemTime l_data;
-  l_data.time = l_delta;
-  l_data.system_name = "AI";
-
-  Log_LogData(LOG_TYPE_SYSTEMTIME, ((LogDataGeneric){"Engine.c"}), &l_data);
-
-  AEGetTime(&l_current);
-
-  //Orig
   InputEvent_Update(delta);
-  
-  AEGetTime(&l_last);
-  l_delta = (float)(l_last - l_current);
-  l_data.time = l_delta;
-  l_data.system_name = "Input";
-
-  Log_LogData(LOG_TYPE_SYSTEMTIME, ((LogDataGeneric){"Engine.c"}), &l_data);
-
-  //Orig
   Entity_Update(delta);
-
-  AEGetTime(&l_current);
-
-  //Orig
   Sound_Update(delta);
-
-  AEGetTime(&l_last);
-  l_delta = (float)(l_last - l_current);
-  l_data.time = l_delta;
-  l_data.system_name = "Sound";
-
-  Log_LogData(LOG_TYPE_SYSTEMTIME, ((LogDataGeneric){"Engine.c"}), &l_data);
-  
   Graphics_Update(delta);
-  
   //AIManager_Debug();
-  
   //Physics_BroadPhase_Debug();
 
   return delta;
@@ -173,22 +131,10 @@ float Engine_UpdateStart(void)
  */
 void Engine_UpdateEnd()
 {
-  f64 l_current;
-  AEGetTime(&l_current);
-
-  //Orig
+  LogDataTime timeData;
+  timeData.time = Time_Get();
+  Log_LogData(LOG_TYPE_TIME, ((LogDataGeneric){"Engine.c"}), &timeData);
   AESysFrameEnd();
-
-  f64 l_last;
-  AEGetTime(&l_last);
-  
-  float l_delta = (float)(l_last - l_current);
-
-  LogDataSystemTime l_data;
-  l_data.time = l_delta;
-  l_data.system_name = "AE_Graphics";
-
-  Log_LogData(LOG_TYPE_SYSTEMTIME, ((LogDataGeneric){"Engine.c"}), &l_data);
 }
 
 /*!
