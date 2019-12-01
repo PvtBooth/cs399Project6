@@ -1,77 +1,51 @@
 <!DOCTYPE html>
 <html>
   <head>
-
-    <title>CS399 Project6</title>
+    <title>CS399 Project 7</title>
     <link rel="stylesheet" href="styles.css">
     <script src="https://d3js.org/d3.v5.min.js"></script>
     <script src="https://code.jquery.com/jquery-3.4.1.min.js"></script>
-
     <!-- Tooltip -->
     <script src="d3-tip.js"></script>
-
   </head>
 
   <body>
     <div class="loadingwheel">
         <span id = "loading"> Loading... <div class="loader"></div> </span>
-      </div>
-    
-    <div class="bigmenu">
-    
-      <div class="menu">
+    </div>
 
+
+    <!-- SVGs -->
       <div class="item">
-          <label for="strategy_selector">Unit Tests:&emsp;&ensp;
+          <label>Unit Tests:
           <select onchange="changeStrategy(this.value)">
             <option value="s0">Bomb</option>
             <option value="s1">Gravitas</option>
             <option value="s2">Missile</option>
             <option value="s3">Spray n Pray</option>
           </select>
-          </label>
-        </div>
-      </div>
-      
-      <div class="menu">
-        <div class="item2">
           <svg class="text DPSText" id="DPSText"></svg>
           <svg class="text DamageReceivedText" id="DamageReceivedText"></svg>
           <svg class="text AverageFrameTimeText" id="AverageFrameTimeText"></svg>
-        </div>
-      </div>
-    </div>
-
-    <div class="item">
-      <label for="LevelSelector">System Tests:&emsp;&ensp;
-      <select onchange="changeLevel(this.value)">
-        <option value="s0">Level 1</option>
-        <option value="s1">Level 7</option>
-        <option value="s2">Level 15</option>
-        <option value="s3">Level 50</option>
-        <option value="s4">Level 100</option>
-      </select>
-      </label>
-    </div>
-  </div>
-
-    <!-- SVGs -->
-    <div class="graphs">
+      </label> 
       <svg class="svg DamageChart" id="DamageChart"></svg>
-      <svg class="svg percentage_histogram" id="percentage_histogram"></svg>
-      <svg class="svg SystemAverageTimeChart" id="SystemAverageTimeChart"></svg>
-      <svg class="svg SystemAverageLevelChart" id="SystemAverageLevelChart"></svg>
-      
-      <!-- Buttons for panning -->
-      <div class="pan">
-        <span class="tooltiptext">Hold</span>
-        <button type="button" onmousedown="panLeft()" onmouseup="stopPanLeft()">Pan Left</button>
-        <button type="button" onmousedown="panRight()" onmouseup="stopPanRight()">Pan Right</button>
+        <svg class="svg HeatMap" id="HeatMap"></svg>
       </div>
-      
+      <label>&emsp;&ensp;</label>
+      <div class="item">
+        <label for="LevelSelector">System Tests:&emsp;&ensp;
+        <select onchange="changeLevel(this.value)">
+          <option value="s0">Level 1</option>
+          <option value="s1">Level 7</option>
+          <option value="s2">Level 15</option>
+          <option value="s3">Level 50</option>
+          <option value="s4">Level 100</option>
+        </select>
+      </label>
+        <svg class="svg SystemAverageTimeChart" id="SystemAverageTimeChart"></svg>
+        <svg class="svg SystemAverageLevelChart" id="SystemAverageLevelChart"></svg>
+      </div>
       <div class="empty"></div>
-    </div>
-    
     
     <script src="index.js"></script>
   </body>

@@ -33,6 +33,7 @@ function main(data)
   l5Data = data[8];
   AnalyzeUnitTest(bombData);
   RenderDamageChart();
+  RenderHeatMap();
   RenderTextData();
   AnalyzeSystemTest(l1Data);
   RenderAverageTimes();
@@ -47,18 +48,20 @@ var strategy = "s0";
 var DPS = 0.0;
 var DamageReceived = 0.0;
 var enemies = [];
+var initialDamageTime = -1.0;
 
 // Per frame stored values
 var PerFrameData = []; // ENTRIES: Time, PlayerHP, EnemiesHP, TotalEnemies
-
+var PlayerPosition = [];
 function AnalyzeUnitTest(data)
 {
   PerFrameData = [];
+  PlayerPosition = [];
   enemies = [];
   playerHealth = 100.0;
   enemyHealth = 0.0;
   numEnemies = 0;
-  var initialDamageTime = -1.0;
+  initialDamageTime = -1.0;
 
   data.forEach(function(eventLog) {
   if(eventLog.LogType === "L_spawn")
@@ -94,6 +97,15 @@ function AnalyzeUnitTest(data)
         TotalEnemies: numEnemies
       })
     }
+  }
+  else if(eventLog.LogType == "L_transform")
+  {
+    PlayerPosition.push({
+      Time: parseFloat(eventLog.Time),
+      X: parseFloat(eventLog.Team),
+      Y: parseFloat(eventLog.Weapon),
+      Fill: 50
+    });
   }
   else if(eventLog.LogType === "L_death")
   {
@@ -207,11 +219,10 @@ function GetSystemAverageTime(name)
   return time;
 }
 
-
 var margin = {top: 20, right: 20, bottom: 20, left: 20},
     padding = {top: 60, right: 60, bottom: 60, left: 60},
     outerWidth = 910,
-    outerHeight = 500,
+    outerHeight = 400,
     innerWidth = outerWidth - margin.left - margin.right,
     innerHeight = outerHeight - margin.top - margin.bottom,
     width = innerWidth - padding.left - padding.right,
@@ -225,41 +236,6 @@ var text_margin = {top: 0, right: 0, bottom: 0, left: 0},
     text_innerHeight = text_outerHeight - text_margin.top - text_margin.bottom,
     text_width = text_innerWidth - text_padding.left - text_padding.right,
     text_height = text_innerHeight - text_padding.top - text_padding.bottom;
-
-var percent_line_x = d3.scaleTime().range([margin.left, width]);
-var percent_line_y = d3.scaleLinear().range([height, (margin.top)]);
-
-var percent_line_xAxis;
-var percent_line_yAxis;
-
-var percent_line_x_domain;
-var percent_line_y_domain;
-
-var percent_g;
-
-var percentline = d3.line()
-    .x(function(d) { return percent_line_x(d.date); })
-    .y(function(d) { return percent_line_y(d.change); });
-
-var percent_histogram_chart = d3.select(".percentage_histogram")
-    .attr("width", outerWidth)
-    .attr("height", outerHeight)
-    .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-var percent_change_chart = d3.select(".account_percentage_change_line_chart")
-    .attr("width", outerWidth)
-    .attr("height", outerHeight)
-    .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-var histogram_left_max = -8.0;
-var histogram_right_max = 8.0;
-
-var panningLeft = false;
-var panningRight = false;
-var beginningIndex = 0;
-var endingIndex = 80;
 
 function clearChart(chartName)
 {
@@ -294,6 +270,7 @@ var changeStrategy = function(p_strategy)
   }
   RenderDamageChart();
   RenderTextData();
+  RenderHeatMap();
 }
 
 var changeLevel = function(p_level)
@@ -415,7 +392,6 @@ var SystemAverageLevelChart = d3.select(".SystemAverageLevelChart")
 
 function RenderSystemAverageLevelChart()
 {
-  //Damage Chart
   clearChart("SystemAverageLevelChart");
   SystemAverageLevelChart = d3.select(".SystemAverageLevelChart")
     .attr("width", outerWidth)
@@ -431,6 +407,7 @@ function RenderSystemAverageLevelChart()
   var max = d3.max(PerLevelSystemData, function(d) { return d.AverageTime; });
   var yDomain = yScale.domain([0, max]);
   var SystemLine = d3.line()
+    .curve(d3.curveCardinal)
     .x(function(d) { return xScale(d.Level); })
     .y(function(d) { return yScale(d.AverageTime); });
 
@@ -525,6 +502,11 @@ var EnemyHPLine = d3.line()
     .x(function(d) { return xScaleDamage(d.Time); })
     .y(function(d) { return yScaleDamage(d.EnemiesHP); });
 
+var tooltipLine;
+var tooltip = d3.tip()  
+  .attr('class', 'd3-tip')
+  .offset([-10, 0]);
+var tipBox;
 function RenderDamageChart()
 {
     // Damage Graph:x Time,y1 PlayerHP,y2 EnemiesHP,y3 TotalEnemies
@@ -534,7 +516,8 @@ function RenderDamageChart()
 
   var DamageChart_g = DamageChart.append("g")
     .attr("transform", "translate(" + padding.left + "," + padding.top + ")");
-
+  
+  tooltipLine = DamageChart_g.append('line');
   // Add the valueline path.
   DamageChart_g.append("path")
       .data([PerFrameData])
@@ -594,6 +577,142 @@ function RenderDamageChart()
       .attr("y", 0)
       .style("text-anchor", "middle")
       .text("Unit Test Analysis");
+
+  DamageChart_g.call(tooltip);
+  
+  tipBox = DamageChart_g.append('rect')
+      .attr('width', width)
+      .attr('height', height)
+      .attr('opacity', 0)
+      .on('mouseover', tooltip.show)
+      .on('mousemove', drawTooltip)
+      .on('mouseout', removeTooltip);
+}
+
+function removeTooltip() {
+  if (tooltipLine) tooltipLine.attr('stroke', 'none');
+  ResetPlayerPositionFill(50);
+  RenderHeatMap();
+  tooltip.hide();
+}
+function drawTooltip() {
+  const time = xScaleDamage.invert(d3.mouse(tipBox.node())[0]);    
+  tooltipLine.attr('stroke', 'black')
+    .attr('x1', xScaleDamage(time))
+    .attr('x2', xScaleDamage(time))
+    .attr('y1', 0)
+    .attr('y2', height);
+
+  tooltip.hide();
+  var log = PerFrameData.find(element => element.Time > time);
+  tooltip.offset([0, xScaleDamage(time) - width/2])
+    .html("<strong>Frame Time: </strong> <span style='color:white'>" + log.Time + "</span><br>" +
+    "<strong>Player HP: </strong> <span style='color:green'>" + log.PlayerHP + "</span><br>" + 
+    "<strong>Enemy Total HP: </strong> <span style='color:orange'>" + log.EnemiesHP + "</span><br>" +
+    "<strong>Enemy Count: </strong> <span style='color:red'>" + log.TotalEnemies + "</span><br>");
+
+  ResetPlayerPositionFill(30);
+  PlayerPosition.find(entry => entry.Time - initialDamageTime >  log.Time).Fill = 100;
+  RenderHeatMap();
+  tooltip.show();
+}
+
+function ResetPlayerPositionFill(fillVal)
+{
+  PlayerPosition.forEach(d => d.Fill = fillVal)
+}
+
+// ============================ Heat Map ====================================
+
+var HeatMap = d3.select(".HeatMap")
+    .attr("width", outerWidth)
+    .attr("height", outerHeight)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+    
+function RenderHeatMap()
+{
+  clearChart("HeatMap");
+  HeatMap = d3.select(".HeatMap")
+  .attr("width", outerWidth)
+  .attr("height", outerHeight)
+  .append("g")
+  .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+  HeatMap.append("text")
+  .attr("x", 0 + (outerWidth/2))
+  .attr("y", 0)
+  .style("text-anchor", "middle")
+  .text("Player Heat Map");
+  // Scale the range of the data
+  var xScale = d3.scaleLinear().range([margin.left, height]);
+  var yScale = d3.scaleLinear().range([height, margin.top]);
+  var xMax = d3.max(PlayerPosition, function(d) { return d.X; });
+  var xMin = d3.min(PlayerPosition, function(d) { return d.X; });
+  var yMax = d3.max(PlayerPosition, function(d) { return d.Y; });
+  var yMin = d3.min(PlayerPosition, function(d) { return d.Y; });
+  var xDomain, yDomain;
+  
+  var deltaRange = xMax - xMin - (yMax - yMin);
+  if(deltaRange > 0)
+  {
+    xDomain = xScale.domain([xMin, xMax]);  
+    yDomain = yScale.domain([yMin - deltaRange / 2, yMax + deltaRange / 2]);
+  }
+  else
+  {
+    xDomain = xScale.domain([xMin + deltaRange / 2, xMax - deltaRange / 2]);  
+    yDomain = yScale.domain([yMin, yMax]);
+  }
+   
+  var HeatMap_g = HeatMap.append("g")
+    .attr("transform", "translate(" + (padding.left + (width - height) / 2) + "," + padding.top + ")");
+  
+    HeatMap_g.append("g")
+    .attr("transform", "translate(0," + height + ")")
+    .call(d3.axisBottom(xScale))
+    .selectAll("text")  
+      .style("text-anchor", "end")
+      .attr("dx", "-.8em")
+      .attr("dy", "-.15em")
+      .attr("transform", "rotate(-45)");
+  
+  // text label for the x axis
+  HeatMap_g.append("text")             
+    .attr("transform",
+    "translate(" + (((width/2) + margin.left) - (width - height) / 2) + " ," + 
+                    (height + (margin.bottom) + margin.top + 10) + ")")
+      .style("text-anchor", "middle")
+      .text("X");
+
+  // Add the y Axis
+  HeatMap_g.append("g")
+    .attr("transform", "translate(" + margin.left + ",0)")
+    .call(d3.axisLeft(yScale));
+
+  // text label for the y axis
+  HeatMap.append("text")
+    .attr("x", 0 + (margin.left/4) + (width - height) / 2)
+    .attr("y", (((height)/1.8) + margin.top + margin.bottom) )
+    .attr("dy", "1em")
+    .style("text-anchor", "middle")
+    .text("Y");
+
+  // Build color scale
+  var myColor = d3.scaleLinear()
+    .range(["white", "red"])
+    .domain([1,100])
+    
+  // Add the valueBar bar
+  HeatMap_g.selectAll()
+      .data(PlayerPosition)
+      .enter()
+      .append("rect")
+      .attr("x", d => xDomain(d.X))
+      .attr("y", d => yDomain(d.Y))
+      .attr("width", 2.0 )
+      .attr("height", 2.0 )
+      .style("fill", d => myColor(d.Fill) )
 }
 
 function RenderTextData()
@@ -641,264 +760,6 @@ function RenderTextData()
         .text("Average Frame Time: " + d3.format(".6f")(AverageFrameTime));
 }
 
-// ==================================== PAN =========================================
-
-// var clearIntervalIDRight;
-// var clearIntervalIDLeft;
-// function panLeft()
-// {
-//   panningLeft = true;
-
-//   clearIntervalIDLeft = setInterval(function(){panning();}, 100);
-// }
-
-// function stopPanLeft()
-// {
-//   panningLeft = false;
-
-//   clearInterval(clearIntervalIDLeft);
-
-//   console.log("Clearing left");
-// }
-
-// function panRight()
-// {
-//   panningRight = true;
-
-//   clearIntervalIDRight = setInterval(function(){panning();}, 100);
-// }
-
-// function stopPanRight()
-// {
-//   panningRight = false;
-
-//   clearInterval(clearIntervalIDRight);
-
-//   console.log("Clearing right");
-// }
-
-// var percent_line_domain_beginning;
-// var percent_line_domain_end;
-
-// var renderPercentChangeArray = [];
-
-// function initializeEndingIndex(value)
-// {
-//   if(DailyPercentageChangesWithDates.length <= value)
-//   {
-//     endingIndex = Math.round(value / 2);
-
-//     initializeEndingIndex(endingIndex);
-//   }
-// }
-
-// function panning()
-// {
-//   if(panningRight || panningLeft)
-//   {
-//     var t = percent_change_chart.transition().duration(750);
-
-//     if(panningLeft)
-//     {
-//       console.log("Panning Left");
-//       if(!(beginningIndex - 1 <= 0))
-//       {
-//         beginningIndex -= 1;
-//         endingIndex -= 1;
-//       }
-//       else
-//       {
-//         return;
-//       }
-//     }
-//     else if(panningRight)
-//     {
-//       console.log("Panning Right");
-//       if(!(endingIndex + 1 >= DailyPercentageChangesWithDates.length - 1))
-//       {
-//         beginningIndex += 1;
-//         endingIndex += 1;
-//       }
-//       else
-//       {
-//         return;
-//       }
-//     }
-
-//     renderPercentChangeArray = [];
-
-//     clearChart("account_percentage_change_line_chart");
-//     percent_change_chart = d3.select(".account_percentage_change_line_chart")
-//     .attr("width", outerWidth)
-//     .attr("height", outerHeight)
-//     .append("g")
-//     .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-//     renderPercentChangeChart();
-//   } 
-// }
-
-// function renderPercentChangeChart()
-// {
-// //Percentage Change Line Graph
-//     percent_line_x_domain = d3.extent(DailyPercentageChangesWithDates, function(d, i) { return d.date; });
-//     percent_line_y_domain = [d3.min(DailyPercentageChangesWithDates, function(d, i) { return d.change; }), d3.max(DailyPercentageChangesWithDates, function(d, i) { return d.change; })];
-
-//     percent_line_domain_beginning = DailyPercentageChangesWithDates[beginningIndex].date;
-//     percent_line_domain_end = DailyPercentageChangesWithDates[endingIndex].date;
-
-//     renderPercentChangeArray = DailyPercentageChangesWithDates.slice(beginningIndex, endingIndex);
-
-//     //percent_line_x.domain(percent_line_x_domain);
-//     percent_line_x.domain([percent_line_domain_beginning, percent_line_domain_end]);
-//     percent_line_y.domain(percent_line_y_domain);
-
-//     var percent_g = percent_change_chart.append("g")
-//       .attr("transform", "translate(" + padding.left + "," + padding.top + ")");
-
-//   //percent_change_chart.transition().duration(750);
-
-//         // Add the percentline path.
-//   percent_g.attr("class", "charts")
-//       .append("path")
-//       //.data([DailyPercentageChangesWithDates])
-//       .data([renderPercentChangeArray])
-//       .attr("class", "line")
-//       .attr("d", percentline)
-//       .attr("fill", "none")
-//       .attr("stroke", "blue")
-//       .attr("stroke-width", 1.5);
-
-//   percent_line_xAxis = d3.axisBottom(percent_line_x);
-
-//     // Add the x Axis
-//   percent_g.append("g")
-//     .attr("class", "axis axis--x")
-//     .attr("transform", "translate(0," + height + ")")
-//     .call(percent_line_xAxis);
-
-//     // text label for the x axis
-//   percent_g.append("text")             
-//       .attr("transform",
-//             "translate(" + ((width/2) + margin.left) + " ," + 
-//                            (height + (margin.bottom) + margin.top) + ")")
-//       .style("text-anchor", "middle")
-//       .text("Date");
-
-//   percent_line_yAxis = d3.axisLeft(percent_line_y);
-
-//     // Add the y Axis
-//   percent_g.append("g")
-//     .attr("class", "axis axis--y")
-//     .attr("transform", "translate(" + margin.left + ",0)")
-//     .call(percent_line_yAxis);
-
-//   // text label for the y axis
-//   percent_change_chart.append("text")
-//       .attr("transform", "rotate(-90)")
-//       .attr("y", 0 + (margin.left/4))
-//       .attr("x",0 - (((height)/1.8) + margin.top + margin.bottom) )
-//       .attr("dy", "1em")
-//       .style("text-anchor", "middle")
-//       .text("Percent");
-
-//   percent_change_chart.append("text")
-//       .attr("x", 0 + (outerWidth/2))
-//       .attr("y", 0)
-//       .style("text-anchor", "middle")
-//       .text("Account Percentage Change By Day");
-// }
-
-// function renderPercentHistogramChart()
-// {
-//   //Histogram graph
-// var histogram = d3.histogram()
-//     .domain([histogram_left_max, histogram_right_max])
-//     .thresholds(histogram_right_max * 4);
-
-// var bins = histogram(DailyPercentageChanges);
-
-//   // Scale the range of the data
-// var bar_x = d3.scaleLinear()
-//     .range([margin.left, width]);
-
-// var bar_x_axis = bar_x.domain([histogram_left_max, histogram_right_max]);
-
-// var bar_y = d3.scaleLinear()
-//     .range([height, margin.top]);
-
-// var bar_y_axis = bar_y.domain([0, d3.max(bins, function(d) { return d.length; })]);
-
-//  // Add the x Axis
-//   percent_histogram_chart.append("g")
-//       .attr("transform", "translate(" + (margin.left + (margin.right/2)) + ", " + (height) + ")")
-//       .call(d3.axisBottom(bar_x).ticks(histogram_right_max * 4));
-
-//     // text label for the x axis
-//   percent_histogram_chart.append("text")             
-//       .attr("transform",
-//             "translate(" + ((width/2) + margin.left + (margin.right)) + " ," + 
-//                            (height + 60) + ")")
-//       .style("text-anchor", "middle")
-//       .text("Percent Account Change");
-
-//     // Add the y Axis
-//   percent_histogram_chart.append("g")
-//       .attr("transform", "translate(" + (margin.left + margin.right + (margin.left / 2)) + ", " + 0 + ")")
-//       .call(d3.axisLeft(bar_y));
-
-//   // text label for the y axis
-//   percent_histogram_chart.append("text")
-//       .attr("transform", "rotate(-90)")
-//       .attr("y", 0)
-//       .attr("x",0 - (height/2))
-//       .attr("dy", "1em")
-//       .style("text-anchor", "middle")
-//       .text("Days");
-
-
-//    // Add the valueBar bar
-//    percent_histogram_chart.selectAll("rect")
-//       .data(bins)
-//       .enter().append("rect")
-//       .attr("class", "bar")
-//       .attr("x", d => bar_x_axis(d.x0) + (margin.left + (margin.right/2)))
-//       .attr("y", function(d) { /*console.log(d.length);*/ return bar_y_axis(d.length); })
-//       .attr("height", function(d) { return height - bar_y_axis(d.length); })
-//       .attr("width", d => Math.max(0, bar_x_axis(d.x1) - bar_x_axis(d.x0) - 1))
-//       .attr("fill", function(d) {return colorOfBar(d.x0);});
-
-//     percent_histogram_chart.append("text")
-//       .attr("x", 0 + (outerWidth/2))
-//       .attr("y", 0)
-//       .style("text-anchor", "middle")
-//       .text("Number of Days per Percentage Change Range");
-// }
-// var ResetCharts = function()
-// {
-  // beginningIndex = 0;
-  // endingIndex = 80;
-
-  // panningRight = false;
-  // panningLeft = false;
-
-  // //Clear charts
-  // clearChart("percentage_histogram");
-  // percent_histogram_chart = d3.select(".percentage_histogram")
-  //   .attr("width", outerWidth)
-  //   .attr("height", outerHeight)
-  //   .append("g")
-  //   .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-
-  // //percent_change_chart
-  // clearChart("account_percentage_change_line_chart");
-  // percent_change_chart = d3.select(".account_percentage_change_line_chart")
-  //   .attr("width", outerWidth)
-  //   .attr("height", outerHeight)
-  //   .append("g")
-  //   .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
-// }
-
 function colorOfBar(percent)
 {
   //green
@@ -928,25 +789,6 @@ function colorOfShares(amount, max)
   else
   {
     return "#80ff00";
-  }
-}
-
-function AddToSharesOfStockArray(purchase)
-{
-  var added = false;
-  //Add back to shares
-  for(var i = 0; i < SharesOfStocks.length; ++i)
-  {
-    if(purchase.stock == SharesOfStocks[i].stock)
-    {
-      SharesOfStocks[i].amount += purchase.amount;
-      added = true;
-    }
-  }
-  
-  if(!added)
-  {
-    SharesOfStocks.push({stock: purchase.stock, amount: purchase.amount});
   }
 }
 
