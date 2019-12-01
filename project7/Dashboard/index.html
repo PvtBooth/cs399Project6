@@ -22,7 +22,7 @@
       <div class="menu">
 
       <div class="item">
-          <label for="strategy_selector">Player Type:&emsp;&ensp;
+          <label for="strategy_selector">Unit Tests:&emsp;&ensp;
           <select onchange="changeStrategy(this.value)">
             <option value="s0">Bomb</option>
             <option value="s1">Gravitas</option>
@@ -42,9 +42,23 @@
       </div>
     </div>
 
+    <div class="item">
+      <label for="LevelSelector">System Tests:&emsp;&ensp;
+      <select onchange="changeLevel(this.value)">
+        <option value="s0">Level 1</option>
+        <option value="s1">Level 7</option>
+        <option value="s2">Level 15</option>
+        <option value="s3">Level 50</option>
+        <option value="s4">Level 100</option>
+      </select>
+      </label>
+    </div>
+  </div>
+
     <!-- SVGs -->
     <div class="graphs">
       <svg class="svg DamageChart" id="DamageChart"></svg>
+      <svg class="svg SystemAverageTimeChart" id="SystemAverageTimeChart"></svg>
       
       <svg class="svg account_percentage_change_line_chart" id="account_percentage_change_line_chart"></svg>
       
@@ -57,7 +71,6 @@
       
       <svg class="svg percentage_histogram" id="percentage_histogram"></svg>
       
-      <svg class="svg stock_bar_chart" id="stock_bar_chart"></svg>
 
       
       <div class="empty"></div>
