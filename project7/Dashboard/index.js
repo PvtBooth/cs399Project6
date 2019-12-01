@@ -32,7 +32,10 @@ function main(data)
   l4Data = data[7];
   l5Data = data[8];
   AnalyzeUnitTest(bombData);
+  RenderDamageChart();
+  RenderTextData();
   AnalyzeSystemTest(l1Data);
+  RenderAverageTimes();
 }
 
 // Main Data
@@ -50,13 +53,6 @@ var PerFrameData = []; // ENTRIES: Time, PlayerHP, EnemiesHP, TotalEnemies
 
 function AnalyzeUnitTest(data)
 {
-  //Damage Chart
-  clearChart("DamageChart");
-  DamageChart = d3.select(".DamageChart")
-    .attr("width", outerWidth)
-    .attr("height", outerHeight)
-    .append("g")
-    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
   PerFrameData = [];
   enemies = [];
   playerHealth = 100.0;
@@ -115,14 +111,12 @@ function AnalyzeUnitTest(data)
       TotalEnemies: numEnemies
     });
   }})
-  RenderDamageChart();
 
   var lastInfo =  PerFrameData[PerFrameData.length - 1];
   var FightDuration = lastInfo.Time - initialDamageTime;
   DPS = 120 / FightDuration;
   DamageReceived = 100 - lastInfo.PlayerHP;
   AverageFrameTime = lastInfo.Time / PerFrameData.length;
-  RenderTextData();
 }
 
 function GetEnemyTotalHP(){
@@ -134,13 +128,6 @@ function GetEnemyTotalHP(){
 var SystemData = [];
 function AnalyzeSystemTest(data)
 {
-  //System Time Bar Chart
-  clearChart("SystemAverageTimeChart");
-  SystemAverageTimeChart = d3.select(".SystemAverageTimeChart")
-    .attr("width", outerWidth)
-    .attr("height", outerHeight)
-    .append("g")
-    .attr("transform", "translate(" + margin.left + "," +margin.top + ")");
   SystemData = [];
   SystemData.push({System: "AE_Graphics", TimeTotal: 0.0, Count : 0, AverageTime : 0.0, Min: 10.0, Max: 0.0, StdDev: 0.0});
   SystemData.push({System: "Physics", TimeTotal: 0.0, Count : 0, AverageTime : 0.0, Min: 10.0, Max: 0.0, StdDev: 0.0});
@@ -184,8 +171,42 @@ function AnalyzeSystemTest(data)
     if(sys.Count != 0)
       sys.StdDev = Math.sqrt(rms / sys.Count);
   });
-  RenderAverageTimes();
 }
+
+var SystemName = "";
+var PerLevelSystemData = [];
+function OnBarClick(data,i)
+{
+  //System Time Bar Chart
+  clearChart("SystemAverageLevelChart");
+  SystemAverageLevelChart = d3.select(".SystemAverageLevelChart")
+    .attr("width", outerWidth)
+    .attr("height", outerHeight)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," +margin.top + ")");
+
+  SystemName = data.System;
+  
+  PerLevelSystemData = [];
+  AnalyzeSystemTest(l1Data); PerLevelSystemData.push({Level: "Level 1", AverageTime : GetSystemAverageTime(SystemName)});
+  AnalyzeSystemTest(l2Data); PerLevelSystemData.push({Level: "Level 7", AverageTime : GetSystemAverageTime(SystemName)});
+  AnalyzeSystemTest(l3Data); PerLevelSystemData.push({Level: "Level 15", AverageTime : GetSystemAverageTime(SystemName)});
+  AnalyzeSystemTest(l4Data); PerLevelSystemData.push({Level: "Level 50", AverageTime : GetSystemAverageTime(SystemName)});
+  AnalyzeSystemTest(l5Data); PerLevelSystemData.push({Level: "Level 100", AverageTime : GetSystemAverageTime(SystemName)});
+  RenderSystemAverageLevelChart();
+}
+
+function GetSystemAverageTime(name)
+{
+  var time = 0.0;
+  SystemData.forEach(sys => 
+  {
+    if(sys.System === name)
+      time = sys.AverageTime;
+  })
+  return time;
+}
+
 
 var margin = {top: 20, right: 20, bottom: 20, left: 20},
     padding = {top: 60, right: 60, bottom: 60, left: 60},
@@ -247,6 +268,14 @@ function clearChart(chartName)
 
 var changeStrategy = function(p_strategy)
 {
+  //Damage Chart
+  clearChart("DamageChart");
+  DamageChart = d3.select(".DamageChart")
+    .attr("width", outerWidth)
+    .attr("height", outerHeight)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+  
   if(p_strategy == "s0")
   {
     AnalyzeUnitTest(bombData)
@@ -263,10 +292,20 @@ var changeStrategy = function(p_strategy)
   {
     AnalyzeUnitTest(sprayData)
   }
+  RenderDamageChart();
+  RenderTextData();
 }
 
 var changeLevel = function(p_level)
 {
+  //System Time Bar Chart
+  clearChart("SystemAverageTimeChart");
+  SystemAverageTimeChart = d3.select(".SystemAverageTimeChart")
+    .attr("width", outerWidth)
+    .attr("height", outerHeight)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," +margin.top + ")");
+
   if(p_level == "s0")
     AnalyzeSystemTest(l1Data);
   else if(p_level == "s1")
@@ -277,8 +316,9 @@ var changeLevel = function(p_level)
     AnalyzeSystemTest(l4Data);
   else if(p_level == "s4")
     AnalyzeSystemTest(l5Data);
+  
+    RenderAverageTimes();
 }
-
 
 // ============================ SYSTEM_HISTOGRAM ====================================
 var SystemAverageTimeChart = d3.select(".SystemAverageTimeChart")
@@ -361,8 +401,87 @@ function RenderAverageTimes()
       .attr("height", function(d) { return height - yDomain(d.AverageTime) })
       .attr("width", xScale.bandwidth())
       .on('mouseover', tip.show)
-      .on('mouseout', tip.hide);
+      .on('mouseout', tip.hide)
+      .on('click', (d,i) => OnBarClick(d,i));
 }
+
+// ============================= SYSTEM_LEVEL_CHART ==============================
+
+var SystemAverageLevelChart = d3.select(".SystemAverageLevelChart")
+    .attr("width", outerWidth)
+    .attr("height", outerHeight)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+function RenderSystemAverageLevelChart()
+{
+  //Damage Chart
+  clearChart("SystemAverageLevelChart");
+  SystemAverageLevelChart = d3.select(".SystemAverageLevelChart")
+    .attr("width", outerWidth)
+    .attr("height", outerHeight)
+    .append("g")
+    .attr("transform", "translate(" + margin.left + "," + margin.top + ")");
+
+  // Scale the range of the data
+  var xScale = d3.scaleBand().range([margin.left, width]);
+  var yScale = d3.scaleLinear().range([height, margin.top]);
+
+  var xDomain = xScale.domain(PerLevelSystemData.map(function(d) { return d.Level; }));
+  var max = d3.max(PerLevelSystemData, function(d) { return d.AverageTime; });
+  var yDomain = yScale.domain([0, max]);
+  var SystemLine = d3.line()
+    .x(function(d) { return xScale(d.Level); })
+    .y(function(d) { return yScale(d.AverageTime); });
+
+  var SystemAverageLevelChart_g = SystemAverageLevelChart.append("g")
+    .attr("transform", "translate(" + padding.left + "," + padding.top + ")");
+
+  // Add the valueline path.
+  SystemAverageLevelChart_g.append("path")
+      .data([PerLevelSystemData])
+      .attr("class", "line")
+      .attr("d", SystemLine)
+      .attr("fill", "none")
+      .attr("stroke", "Grey")
+      .attr("stroke-width", 1.5);
+
+  // Add the x Axis
+  SystemAverageLevelChart_g.append("g")
+    .attr("class", "x axis")
+    .attr("transform", "translate(0," + height + ")")
+    .call(d3.axisBottom(xScale));
+
+  // text label for the x axis
+  SystemAverageLevelChart_g.append("text")             
+      .attr("transform",
+            "translate(" + ((width/2) + margin.left) + " ," + 
+                           (height + (margin.bottom) + margin.top) + ")")
+      .style("text-anchor", "middle")
+      .text("Level");
+
+  // Add the y Axis
+  SystemAverageLevelChart_g.append("g")
+    .attr("class", "y axis")
+    .attr("transform", "translate(" + margin.left + ",0)")
+    .call(d3.axisLeft(yScale));
+
+  // text label for the y axis
+  SystemAverageLevelChart.append("text")
+      .attr("transform", "rotate(-90)")
+      .attr("y", 0 + (margin.left/4))
+      .attr("x",0 - (((height)/1.8) + margin.top + margin.bottom) )
+      .attr("dy", "1em")
+      .style("text-anchor", "middle")
+      .text("Average Time per Frame");
+
+  SystemAverageLevelChart.append("text")
+      .attr("x", 0 + (outerWidth/2))
+      .attr("y", 0)
+      .style("text-anchor", "middle")
+      .text("Per Level Performance Analysis");
+}
+
 
 // ============================ DAMAGE_CHART ====================================
 var DamageChart = d3.select(".DamageChart")
@@ -416,7 +535,7 @@ function RenderDamageChart()
   var DamageChart_g = DamageChart.append("g")
     .attr("transform", "translate(" + padding.left + "," + padding.top + ")");
 
-        // Add the valueline path.
+  // Add the valueline path.
   DamageChart_g.append("path")
       .data([PerFrameData])
       .attr("class", "line")
