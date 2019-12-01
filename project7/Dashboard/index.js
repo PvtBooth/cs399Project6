@@ -512,7 +512,7 @@ function RenderDamageChart()
     // Damage Graph:x Time,y1 PlayerHP,y2 EnemiesHP,y3 TotalEnemies
     // Scale the range of the data
   xScaleDamage.domain(d3.extent(PerFrameData, function(d, i) { return d.Time; }));
-  yScaleDamage.domain([0, d3.max(PerFrameData, function(d, i) { return d.PlayerHP; })]);
+  yScaleDamage.domain([0, d3.max(PerFrameData, function(d, i) { return d.EnemiesHP; })]);
 
   var DamageChart_g = DamageChart.append("g")
     .attr("transform", "translate(" + padding.left + "," + padding.top + ")");
