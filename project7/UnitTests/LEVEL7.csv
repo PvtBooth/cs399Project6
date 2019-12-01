@@ -1,4 +1,4 @@
-Time,CppFile,Type,System,Duration,Header6,Header7,Header8,Header9,Header10,Header11,Header12
+Time,CppFile,LogType,SourceType,SourceID,Team,Weapon,Damage,DestinationType,DestinationID,X,Y
 0.016679,LevelState.c,L_string,Level Start,,,,,,,,
 0.016679,LevelGenNormal.c,L_spawn,EnemyStation,4468,L_TeamEnemy,1688.72,-2916.77,,,,
 0.016679,LevelGenNormal.c,L_spawn,EnemyStation,4471,L_TeamEnemy,-2235.95,-962.535,,,,
